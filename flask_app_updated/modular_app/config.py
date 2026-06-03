@@ -10,6 +10,7 @@ from typing import Optional
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
 HF_API_TOKEN = os.getenv('HF_API_TOKEN')
 LLAMA_MODEL_PATH = os.getenv('LLAMA_MODEL_PATH')
+OLLAMA_MODEL = os.getenv('OLLAMA_MODEL', 'qwen3:32b')    
 FALLBACK_CHUNK_SIZE = int(os.getenv('FALLBACK_CHUNK_SIZE', '8000'))
 LLM_TIMEOUT_SECONDS = int(os.getenv('LLM_TIMEOUT_SECONDS', '600'))
 
@@ -33,6 +34,7 @@ class AppConfig:
     gemini_api_key: Optional[str] = GEMINI_API_KEY
     hf_api_token: Optional[str] = HF_API_TOKEN
     llama_model_path: Optional[str] = LLAMA_MODEL_PATH
+    ollama_model: str = OLLAMA_MODEL    
     
     # Processing settings
     fallback_chunk_size: int = FALLBACK_CHUNK_SIZE

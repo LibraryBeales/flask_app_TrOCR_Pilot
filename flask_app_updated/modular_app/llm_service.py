@@ -146,24 +146,6 @@ Corrected text:
         except Exception as e:
             logger.warning(f"Ollama not available: {e}")
         return False
-        
-        # AFTER ✅
-        try:
-            # Ensure you accepted Llama 3.1 Community License before downloading weights. 
-             # See: https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct
-            self.local_llama_client = Llama(
-                model_path=self.config.llama_model_path,
-                n_ctx=4096,           # Increased from 2048 for longer documents
-                n_threads=4,
-                n_gpu_layers=-1,      # Offload ALL layers to GPU
-                tensor_split=[0.5, 0.5],    # 50/50 split between GPU 0 and GPU 1    
-                verbose=False
-            )
-            logger.info("Local LLaMA model initialized successfully")
-            return True
-        except Exception as e:
-            logger.error(f"Failed to initialize local LLaMA: {e}")
-            return False
 
     
     def try_local_llama_correction(self, text: str, context: str = "") -> Tuple[str, str]:
@@ -177,8 +159,7 @@ Corrected text:
             response = requests.post(
                 "http://localhost:11434/api/generate",
                 json={
-                    #"model": "llama3.1:70b-instruct-q4_K_M",
-                    "model": "qwen3:32b",
+                    "model": getattr(self.config, 'ollama_model', 'qwen3:32b'),
                     "prompt": prompt,
                     "stream": False
                 },
@@ -283,41 +264,105 @@ Corrected text:
             return text, "max_retries_exceeded"
     
     def process_line_segments_with_gemini(self, line_segments: List[Dict], context: str = "") -> List[Dict]:
-        """Process line segments with LLM correction"""
-        corrected_segments = []
-        previous_context = context
+        """Process all line segments in a single batch LLM call"""
+        import re
 
-        for i, segment in enumerate(line_segments):
-            original_text = segment.get('ocr_text', '')
+        # Separate empty and non-empty lines
+        non_empty = [
+            s for s in line_segments
+            if s.get('ocr_text', '').strip()
+        ]
 
-            if not original_text.strip():
-                # Empty line — copy as is with empty corrected field
-                corrected_segment = segment.copy()
-                corrected_segment['ocr_text_corrected'] = ''
-                corrected_segment['correction_status'] = 'empty'
-                corrected_segments.append(corrected_segment)
-                continue
+        if not non_empty:
+            for segment in line_segments:
+                segment['ocr_text_corrected'] = segment.get('ocr_text', '')
+                segment['correction_status'] = 'empty'
+            return line_segments
 
-            # Run correction
-            corrected_text, status = self.process_text_with_gemini(
-                original_text, previous_context
+        # Build single prompt with all lines numbered
+        lines_text = '\n'.join([
+            f"{i+1}. {s.get('ocr_text', '')}"
+            for i, s in enumerate(non_empty)
+        ])
+
+        prompt = f"""You are correcting OCR text from a scanned historical document.
+    Below are {len(non_empty)} lines of OCR output, each numbered.
+    Fix only clear OCR errors, spelling mistakes, and garbled characters.
+    Preserve the original language, style, and formatting.
+    Return ONLY the corrected lines in the same numbered format.
+    Do not add explanations or commentary.
+
+    OCR lines to correct:
+    {lines_text}
+
+    Corrected lines:
+    """
+
+        try:
+            model_name = getattr(self.config, 'ollama_model', 'qwen3:32b')
+            response = requests.post(
+                "http://localhost:11434/api/generate",
+                json={
+                    "model": model_name,
+                    "prompt": prompt,
+                    "stream": False
+                },
+                timeout=self.config.llm_timeout_seconds
             )
 
-            # Build the corrected segment explicitly
-            corrected_segment = segment.copy()
-            corrected_segment['ocr_text_corrected'] = corrected_text
-            corrected_segment['correction_status'] = status
+            if response.status_code == 200:
+                result = response.json()
+                raw_response = result.get('response', '').strip()
 
-            corrected_segments.append(corrected_segment)
+                # Parse numbered lines from response
+                corrected_map = {}
+                for line in raw_response.split('\n'):
+                    line = line.strip()
+                    if not line:
+                        continue
+                    match = re.match(r'^(\d+)\.\s*(.*)', line)
+                    if match:
+                        idx = int(match.group(1)) - 1
+                        text = match.group(2).strip()
+                        if 0 <= idx < len(non_empty):
+                            corrected_map[idx] = text
 
-            # Update context for next line
-            if status == 'success':
-                previous_context = self.get_last_two_lines(corrected_text)
+                # Apply corrections back to all segments
+                non_empty_index = 0
+                corrected_segments = []
 
-            # Small delay to avoid hammering Ollama
-            time.sleep(0.1)
+                for segment in line_segments:
+                    corrected_segment = segment.copy()
 
-        return corrected_segments
+                    if segment.get('ocr_text', '').strip():
+                        corrected_text = corrected_map.get(
+                            non_empty_index,
+                            segment.get('ocr_text', '')
+                        )
+                        corrected_segment['ocr_text_corrected'] = corrected_text
+                        corrected_segment['correction_status'] = 'success'
+                        non_empty_index += 1
+                    else:
+                        corrected_segment['ocr_text_corrected'] = ''
+                        corrected_segment['correction_status'] = 'empty'
+
+                    corrected_segments.append(corrected_segment)
+
+                logger.info(
+                    f"Batch LLM correction complete: "
+                    f"{len(corrected_map)}/{len(non_empty)} lines corrected "
+                    f"using {model_name}"
+                )
+                return corrected_segments
+
+        except Exception as e:
+            logger.error(f"Batch LLM correction failed: {e}")
+
+        # Fallback if LLM call fails — return originals unchanged
+        for segment in line_segments:
+            segment['ocr_text_corrected'] = segment.get('ocr_text', '')
+            segment['correction_status'] = 'llm_failed'
+        return line_segments
     
     def manual_fallback_test(self) -> Tuple[str, str]:
         """Test function to verify fallback system"""
