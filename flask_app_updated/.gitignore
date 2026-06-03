@@ -1,0 +1,12 @@
+\venv
+\uploads
+\templates
+\line_segments
+\inferences
+\annotations
+.env
+\__pycache__
+\llama.cpp
+\modular_app\__pycache__
+llama_build.log
+\detectron2

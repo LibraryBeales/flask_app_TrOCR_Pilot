@@ -1,0 +1,14 @@
+{
+  "image": "Mishkan_Or_Memorial_Book-134_1780423381.jpg",
+  "original_text": "Error during OCR: cannot identify image file 'C:\\\\Users\\\\rdb104\\\\Documents\\\\caserepos\\\\flask_app_TrOCR\\\\flask_app_updated\\\\uploads\\\\Mishkan_Or_Memorial_Book-134_1780423381.jpg'",
+  "pre_llm_text": "Error during OCR: cannot identify image file 'C:\\\\Users\\\\rdb104\\\\Documents\\\\caserepos\\\\flask_app_TrOCR\\\\flask_app_updated\\\\uploads\\\\Mishkan_Or_Memorial_Book-134_1780423381.jpg'",
+  "corrected_text": "Error during OCR: cannot identify image file 'C:\\\\Users\\\\rdb104\\\\Documents\\\\caserepos\\\\flask_app_TrOCR\\\\flask_app_updated\\\\uploads\\\\Mishkan_Or_Memorial_Book-134_1780423381.jpg'",
+  "manual_text": "",
+  "line_segments": [],
+  "total_lines": 0,
+  "pipeline": "fallback",
+  "gemini_processing": false,
+  "llm_corrected": false,
+  "manually_edited": false,
+  "timestamp": 1780423381.2251859
+}

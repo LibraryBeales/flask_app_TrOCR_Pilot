@@ -1,0 +1,1082 @@
+{
+  "image": "Mishkan_Or_Memorial_Book-148_1780425209.jpg",
+  "original_text": "11,917,",
+  "pre_llm_text": "11,917,",
+  "corrected_text": "",
+  "manual_text": "",
+  "line_segments": [
+    {
+      "line_index": 0,
+      "reading_order_index": 0,
+      "column": 0,
+      "position_in_column": 0,
+      "image_filename": "line_000.png",
+      "bbox": [
+        223,
+        226,
+        463,
+        268
+      ],
+      "padded_bbox": [
+        213.0,
+        216.0,
+        473.0,
+        278.0
+      ],
+      "score": 1.0,
+      "ocr_text": "MME      Burton S. Lifson",
+      "ocr_text_pre_llm": "MME      Burton S. Lifson",
+      "ocr_text_corrected": "",
+      "ocr_text_manual": "",
+      "confidence": 1.0,
+      "manually_edited": false
+    },
+    {
+      "line_index": 1,
+      "reading_order_index": 1,
+      "column": 0,
+      "position_in_column": 1,
+      "image_filename": "line_001.png",
+      "bbox": [
+        219,
+        270,
+        455,
+        308
+      ],
+      "padded_bbox": [
+        209.0,
+        260.0,
+        465.0,
+        318.0
+      ],
+      "score": 1.0,
+      "ocr_text": "PARENTS' NAME   N.  Lifson",
+      "ocr_text_pre_llm": "PARENTS' NAME   N.  Lifson",
+      "ocr_text_corrected": "",
+      "ocr_text_manual": "",
+      "confidence": 1.0,
+      "manually_edited": false
+    },
+    {
+      "line_index": 2,
+      "reading_order_index": 2,
+      "column": 0,
+      "position_in_column": 2,
+      "image_filename": "line_002.png",
+      "bbox": [
+        222,
+        315,
+        566,
+        346
+      ],
+      "padded_bbox": [
+        212.0,
+        305.0,
+        576.0,
+        356.0
+      ],
+      "score": 1.0,
+      "ocr_text": "CONFIRMED IN THE TEMPLE:",
+      "ocr_text_pre_llm": "CONFIRMED IN THE TEMPLE:",
+      "ocr_text_corrected": "",
+      "ocr_text_manual": "",
+      "confidence": 1.0,
+      "manually_edited": false
+    },
+    {
+      "line_index": 3,
+      "reading_order_index": 3,
+      "column": 0,
+      "position_in_column": 3,
+      "image_filename": "line_003.png",
+      "bbox": [
+        222,
+        350,
+        528,
+        388
+      ],
+      "padded_bbox": [
+        212.0,
+        340.0,
+        538.0,
+        398.0
+      ],
+      "score": 1.0,
+      "ocr_text": "BRANCH OF SERVICE   Army  Aúr  Force",
+      "ocr_text_pre_llm": "BRANCH OF SERVICE   Army  Aúr  Force",
+      "ocr_text_corrected": "",
+      "ocr_text_manual": "",
+      "confidence": 1.0,
+      "manually_edited": false
+    },
+    {
+      "line_index": 4,
+      "reading_order_index": 4,
+      "column": 0,
+      "position_in_column": 4,
+      "image_filename": "line_004.png",
+      "bbox": [
+        230,
+        384,
+        579,
+        428
+      ],
+      "padded_bbox": [
+        220.0,
+        374.0,
+        589.0,
+        438.0
+      ],
+      "score": 1.0,
+      "ocr_text": "to Air Cadet to 2nd Lt. to Ist Lt.",
+      "ocr_text_pre_llm": "to Air Cadet to 2nd Lt. to Ist Lt.",
+      "ocr_text_corrected": "",
+      "ocr_text_manual": "",
+      "confidence": 1.0,
+      "manually_edited": false
+    },
+    {
+      "line_index": 5,
+      "reading_order_index": 5,
+      "column": 0,
+      "position_in_column": 5,
+      "image_filename": "line_005.png",
+      "bbox": [
+        226,
+        428,
+        993,
+        470
+      ],
+      "padded_bbox": [
+        216.0,
+        418.0,
+        1003.0,
+        480.0
+      ],
+      "score": 1.0,
+      "ocr_text": "conces como uno sexvez: llorember 27, 1942        carzor osoxaxos. August 20, 1346",
+      "ocr_text_pre_llm": "conces como uno sexvez: llorember 27, 1942        carzor osoxaxos. August 20, 1346",
+      "ocr_text_corrected": "",
+      "ocr_text_manual": "",
+      "confidence": 1.0,
+      "manually_edited": false
+    },
+    {
+      "line_index": 6,
+      "reading_order_index": 6,
+      "column": 0,
+      "position_in_column": 6,
+      "image_filename": "line_006.png",
+      "bbox": [
+        223,
+        455,
+        383,
+        487
+      ],
+      "padded_bbox": [
+        213.0,
+        445.0,
+        393.0,
+        497.0
+      ],
+      "score": 1.0,
+      "ocr_text": "RECORD OF SERVICE",
+      "ocr_text_pre_llm": "RECORD OF SERVICE",
+      "ocr_text_corrected": "",
+      "ocr_text_manual": "",
+      "confidence": 1.0,
+      "manually_edited": false
+    },
+    {
+      "line_index": 7,
+      "reading_order_index": 7,
+      "column": 0,
+      "position_in_column": 7,
+      "image_filename": "line_007.png",
+      "bbox": [
+        271,
+        469,
+        536,
+        510
+      ],
+      "padded_bbox": [
+        261.0,
+        459.0,
+        546.0,
+        520.0
+      ],
+      "score": 1.0,
+      "ocr_text": "ORD. S.A. - HEW LONG,",
+      "ocr_text_pre_llm": "ORD. S.A. - HEW LONG,",
+      "ocr_text_corrected": "",
+      "ocr_text_manual": "",
+      "confidence": 1.0,
+      "manually_edited": false
+    },
+    {
+      "line_index": 8,
+      "reading_order_index": 8,
+      "column": 0,
+      "position_in_column": 8,
+      "image_filename": "line_008.png",
+      "bbox": [
+        643,
+        471,
+        952,
+        509
+      ],
+      "padded_bbox": [
+        633.0,
+        461.0,
+        962.0,
+        519.0
+      ],
+      "score": 1.0,
+      "ocr_text": "How LONG,",
+      "ocr_text_pre_llm": "How LONG,",
+      "ocr_text_corrected": "",
+      "ocr_text_manual": "",
+      "confidence": 1.0,
+      "manually_edited": false
+    },
+    {
+      "line_index": 9,
+      "reading_order_index": 9,
+      "column": 0,
+      "position_in_column": 9,
+      "image_filename": "line_009.png",
+      "bbox": [
+        268,
+        513,
+        1002,
+        549
+      ],
+      "padded_bbox": [
+        258.0,
+        503.0,
+        1012.0,
+        559.0
+      ],
+      "score": 1.0,
+      "ocr_text": "o murocoumes»  New Guinea, Bíak, Morotal, Philippines, Oklahoma, Japan",
+      "ocr_text_pre_llm": "o murocoumes»  New Guinea, Bíak, Morotal, Philippines, Oklahoma, Japan",
+      "ocr_text_corrected": "",
+      "ocr_text_manual": "",
+      "confidence": 1.0,
+      "manually_edited": false
+    },
+    {
+      "line_index": 10,
+      "reading_order_index": 10,
+      "column": 0,
+      "position_in_column": 10,
+      "image_filename": "line_010.png",
+      "bbox": [
+        221,
+        555,
+        1109,
+        595
+      ],
+      "padded_bbox": [
+        211.0,
+        545.0,
+        1119.0,
+        605.0
+      ],
+      "score": 1.0,
+      "ocr_text": "Wouvoro.",
+      "ocr_text_pre_llm": "Wouvoro.",
+      "ocr_text_corrected": "",
+      "ocr_text_manual": "",
+      "confidence": 1.0,
+      "manually_edited": false
+    },
+    {
+      "line_index": 11,
+      "reading_order_index": 11,
+      "column": 0,
+      "position_in_column": 11,
+      "image_filename": "line_011.png",
+      "bbox": [
+        279,
+        580,
+        423,
+        629
+      ],
+      "padded_bbox": [
+        269.0,
+        570.0,
+        433.0,
+        639.0
+      ],
+      "score": 1.0,
+      "ocr_text": "Unit Citation",
+      "ocr_text_pre_llm": "Unit Citation",
+      "ocr_text_corrected": "",
+      "ocr_text_manual": "",
+      "confidence": 1.0,
+      "manually_edited": false
+    },
+    {
+      "line_index": 12,
+      "reading_order_index": 12,
+      "column": 0,
+      "position_in_column": 12,
+      "image_filename": "line_012.png",
+      "bbox": [
+        771,
+        242,
+        872,
+        270
+      ],
+      "padded_bbox": [
+        761.0,
+        232.0,
+        882.0,
+        280.0
+      ],
+      "score": 1.0,
+      "ocr_text": "MEMBER  «",
+      "ocr_text_pre_llm": "MEMBER  «",
+      "ocr_text_corrected": "",
+      "ocr_text_manual": "",
+      "confidence": 1.0,
+      "manually_edited": false
+    },
+    {
+      "line_index": 13,
+      "reading_order_index": 13,
+      "column": 0,
+      "position_in_column": 13,
+      "image_filename": "line_013.png",
+      "bbox": [
+        771,
+        276,
+        873,
+        311
+      ],
+      "padded_bbox": [
+        761.0,
+        266.0,
+        883.0,
+        321.0
+      ],
+      "score": 1.0,
+      "ocr_text": "MEMBER  X",
+      "ocr_text_pre_llm": "MEMBER  X",
+      "ocr_text_corrected": "",
+      "ocr_text_manual": "",
+      "confidence": 1.0,
+      "manually_edited": false
+    },
+    {
+      "line_index": 14,
+      "reading_order_index": 14,
+      "column": 0,
+      "position_in_column": 14,
+      "image_filename": "line_014.png",
+      "bbox": [
+        670,
+        349,
+        1073,
+        393
+      ],
+      "padded_bbox": [
+        660.0,
+        339.0,
+        1083.0,
+        403.0
+      ],
+      "score": 1.0,
+      "ocr_text": "RANK AND PROMOTIONS                                                     Corpora.",
+      "ocr_text_pre_llm": "RANK AND PROMOTIONS                                                     Corpora.",
+      "ocr_text_corrected": "",
+      "ocr_text_manual": "",
+      "confidence": 1.0,
+      "manually_edited": false
+    },
+    {
+      "line_index": 15,
+      "reading_order_index": 15,
+      "column": 0,
+      "position_in_column": 15,
+      "image_filename": "line_015.png",
+      "bbox": [
+        215,
+        975,
+        439,
+        1018
+      ],
+      "padded_bbox": [
+        205.0,
+        965.0,
+        449.0,
+        1028.0
+      ],
+      "score": 1.0,
+      "ocr_text": "NAM:  William J. Loeb",
+      "ocr_text_pre_llm": "NAM:  William J. Loeb",
+      "ocr_text_corrected": "",
+      "ocr_text_manual": "",
+      "confidence": 1.0,
+      "manually_edited": false
+    },
+    {
+      "line_index": 16,
+      "reading_order_index": 16,
+      "column": 0,
+      "position_in_column": 16,
+      "image_filename": "line_016.png",
+      "bbox": [
+        215,
+        1012,
+        530,
+        1058
+      ],
+      "padded_bbox": [
+        205.0,
+        1002.0,
+        540.0,
+        1068.0
+      ],
+      "score": 1.0,
+      "ocr_text": "PARENTS' Mme Mrs. Joseph W. Loeb",
+      "ocr_text_pre_llm": "PARENTS' Mme Mrs. Joseph W. Loeb",
+      "ocr_text_corrected": "",
+      "ocr_text_manual": "",
+      "confidence": 1.0,
+      "manually_edited": false
+    },
+    {
+      "line_index": 17,
+      "reading_order_index": 17,
+      "column": 0,
+      "position_in_column": 17,
+      "image_filename": "line_017.png",
+      "bbox": [
+        217,
+        1064,
+        556,
+        1098
+      ],
+      "padded_bbox": [
+        207.0,
+        1054.0,
+        566.0,
+        1108.0
+      ],
+      "score": 1.0,
+      "ocr_text": "CONFIRMED IN THE TEMPLE:",
+      "ocr_text_pre_llm": "CONFIRMED IN THE TEMPLE:",
+      "ocr_text_corrected": "",
+      "ocr_text_manual": "",
+      "confidence": 1.0,
+      "manually_edited": false
+    },
+    {
+      "line_index": 18,
+      "reading_order_index": 18,
+      "column": 0,
+      "position_in_column": 18,
+      "image_filename": "line_018.png",
+      "bbox": [
+        215,
+        1103,
+        573,
+        1137
+      ],
+      "padded_bbox": [
+        205.0,
+        1093.0,
+        583.0,
+        1147.0
+      ],
+      "score": 1.0,
+      "ocr_text": "BRANCH OF SERVICE                       Corps",
+      "ocr_text_pre_llm": "BRANCH OF SERVICE                       Corps",
+      "ocr_text_corrected": "",
+      "ocr_text_manual": "",
+      "confidence": 1.0,
+      "manually_edited": false
+    },
+    {
+      "line_index": 19,
+      "reading_order_index": 19,
+      "column": 0,
+      "position_in_column": 19,
+      "image_filename": "line_019.png",
+      "bbox": [
+        633,
+        1097,
+        919,
+        1140
+      ],
+      "padded_bbox": [
+        623.0,
+        1087.0,
+        929.0,
+        1150.0
+      ],
+      "score": 1.0,
+      "ocr_text": "RANK AND PROMOTIONS",
+      "ocr_text_pre_llm": "RANK AND PROMOTIONS",
+      "ocr_text_corrected": "",
+      "ocr_text_manual": "",
+      "confidence": 1.0,
+      "manually_edited": false
+    },
+    {
+      "line_index": 20,
+      "reading_order_index": 20,
+      "column": 0,
+      "position_in_column": 20,
+      "image_filename": "line_020.png",
+      "bbox": [
+        225,
+        1179,
+        999,
+        1219
+      ],
+      "padded_bbox": [
+        215.0,
+        1169.0,
+        1009.0,
+        1229.0
+      ],
+      "score": 1.0,
+      "ocr_text": "conzor en uno servicio  October 7, 1940                                   escuseas    October  October 22, 1945",
+      "ocr_text_pre_llm": "conzor en uno servicio  October 7, 1940                                   escuseas    October  October 22, 1945",
+      "ocr_text_corrected": "",
+      "ocr_text_manual": "",
+      "confidence": 1.0,
+      "manually_edited": false
+    },
+    {
+      "line_index": 21,
+      "reading_order_index": 21,
+      "column": 0,
+      "position_in_column": 21,
+      "image_filename": "line_021.png",
+      "bbox": [
+        219,
+        1207,
+        377,
+        1235
+      ],
+      "padded_bbox": [
+        209.0,
+        1197.0,
+        387.0,
+        1245.0
+      ],
+      "score": 1.0,
+      "ocr_text": "RECORD OF SERVICE",
+      "ocr_text_pre_llm": "RECORD OF SERVICE",
+      "ocr_text_corrected": "",
+      "ocr_text_manual": "",
+      "confidence": 1.0,
+      "manually_edited": false
+    },
+    {
+      "line_index": 22,
+      "reading_order_index": 22,
+      "column": 0,
+      "position_in_column": 22,
+      "image_filename": "line_022.png",
+      "bbox": [
+        265,
+        1219,
+        1018,
+        1266
+      ],
+      "padded_bbox": [
+        255.0,
+        1209.0,
+        1028.0,
+        1276.0
+      ],
+      "score": 1.0,
+      "ocr_text": "50° S.A.ºS.gov.como, 2 years 10 montos                       «www.com»",
+      "ocr_text_pre_llm": "50° S.A.ºS.gov.como, 2 years 10 montos                       «www.com»",
+      "ocr_text_corrected": "",
+      "ocr_text_manual": "",
+      "confidence": 1.0,
+      "manually_edited": false
+    },
+    {
+      "line_index": 23,
+      "reading_order_index": 23,
+      "column": 0,
+      "position_in_column": 23,
+      "image_filename": "line_023.png",
+      "bbox": [
+        262,
+        1265,
+        434,
+        1297
+      ],
+      "padded_bbox": [
+        252.0,
+        1255.0,
+        444.0,
+        1307.0
+      ],
+      "score": 1.0,
+      "ocr_text": "IN WHAT COUNTRIES?",
+      "ocr_text_pre_llm": "IN WHAT COUNTRIES?",
+      "ocr_text_corrected": "",
+      "ocr_text_manual": "",
+      "confidence": 1.0,
+      "manually_edited": false
+    },
+    {
+      "line_index": 24,
+      "reading_order_index": 24,
+      "column": 0,
+      "position_in_column": 24,
+      "image_filename": "line_024.png",
+      "bbox": [
+        221,
+        1300,
+        703,
+        1341
+      ],
+      "padded_bbox": [
+        211.0,
+        1290.0,
+        713.0,
+        1351.0
+      ],
+      "score": 1.0,
+      "ocr_text": "WOUNDRO",
+      "ocr_text_pre_llm": "WOUNDRO",
+      "ocr_text_corrected": "",
+      "ocr_text_manual": "",
+      "confidence": 1.0,
+      "manually_edited": false
+    },
+    {
+      "line_index": 25,
+      "reading_order_index": 25,
+      "column": 0,
+      "position_in_column": 25,
+      "image_filename": "line_025.png",
+      "bbox": [
+        771,
+        987,
+        865,
+        1018
+      ],
+      "padded_bbox": [
+        761.0,
+        977.0,
+        875.0,
+        1028.0
+      ],
+      "score": 1.0,
+      "ocr_text": "MEMBER",
+      "ocr_text_pre_llm": "MEMBER",
+      "ocr_text_corrected": "",
+      "ocr_text_manual": "",
+      "confidence": 1.0,
+      "manually_edited": false
+    },
+    {
+      "line_index": 26,
+      "reading_order_index": 26,
+      "column": 0,
+      "position_in_column": 26,
+      "image_filename": "line_026.png",
+      "bbox": [
+        764,
+        1028,
+        867,
+        1060
+      ],
+      "padded_bbox": [
+        754.0,
+        1018.0,
+        877.0,
+        1070.0
+      ],
+      "score": 1.0,
+      "ocr_text": "MEMBER",
+      "ocr_text_pre_llm": "MEMBER",
+      "ocr_text_corrected": "",
+      "ocr_text_manual": "",
+      "confidence": 1.0,
+      "manually_edited": false
+    },
+    {
+      "line_index": 27,
+      "reading_order_index": 27,
+      "column": 0,
+      "position_in_column": 27,
+      "image_filename": "line_027.png",
+      "bbox": [
+        217,
+        1704,
+        447,
+        1748
+      ],
+      "padded_bbox": [
+        207.0,
+        1694.0,
+        457.0,
+        1758.0
+      ],
+      "score": 1.0,
+      "ocr_text": "MME   Richard S. Luntz",
+      "ocr_text_pre_llm": "MME   Richard S. Luntz",
+      "ocr_text_corrected": "",
+      "ocr_text_manual": "",
+      "confidence": 1.0,
+      "manually_edited": false
+    },
+    {
+      "line_index": 28,
+      "reading_order_index": 28,
+      "column": 0,
+      "position_in_column": 28,
+      "image_filename": "line_028.png",
+      "bbox": [
+        214,
+        1749,
+        467,
+        1788
+      ],
+      "padded_bbox": [
+        204.0,
+        1739.0,
+        477.0,
+        1798.0
+      ],
+      "score": 1.0,
+      "ocr_text": "PARENTS' NAME     A. M.  Luntz",
+      "ocr_text_pre_llm": "PARENTS' NAME     A. M.  Luntz",
+      "ocr_text_corrected": "",
+      "ocr_text_manual": "",
+      "confidence": 1.0,
+      "manually_edited": false
+    },
+    {
+      "line_index": 29,
+      "reading_order_index": 29,
+      "column": 0,
+      "position_in_column": 29,
+      "image_filename": "line_029.png",
+      "bbox": [
+        214,
+        1789,
+        548,
+        1828
+      ],
+      "padded_bbox": [
+        204.0,
+        1779.0,
+        558.0,
+        1838.0
+      ],
+      "score": 1.0,
+      "ocr_text": "CONFIRMED IN THE TEMPLE:",
+      "ocr_text_pre_llm": "CONFIRMED IN THE TEMPLE:",
+      "ocr_text_corrected": "",
+      "ocr_text_manual": "",
+      "confidence": 1.0,
+      "manually_edited": false
+    },
+    {
+      "line_index": 30,
+      "reading_order_index": 30,
+      "column": 0,
+      "position_in_column": 30,
+      "image_filename": "line_030.png",
+      "bbox": [
+        214,
+        1830,
+        436,
+        1866
+      ],
+      "padded_bbox": [
+        204.0,
+        1820.0,
+        446.0,
+        1876.0
+      ],
+      "score": 1.0,
+      "ocr_text": "BRANCH OF SERVICE",
+      "ocr_text_pre_llm": "BRANCH OF SERVICE",
+      "ocr_text_corrected": "",
+      "ocr_text_manual": "",
+      "confidence": 1.0,
+      "manually_edited": false
+    },
+    {
+      "line_index": 31,
+      "reading_order_index": 31,
+      "column": 0,
+      "position_in_column": 31,
+      "image_filename": "line_031.png",
+      "bbox": [
+        218,
+        1911,
+        546,
+        1950
+      ],
+      "padded_bbox": [
+        208.0,
+        1901.0,
+        556.0,
+        1960.0
+      ],
+      "score": 1.0,
+      "ocr_text": "RACE OF ENTRY INTO SERVICE                                 1942",
+      "ocr_text_pre_llm": "RACE OF ENTRY INTO SERVICE                                 1942",
+      "ocr_text_corrected": "",
+      "ocr_text_manual": "",
+      "confidence": 1.0,
+      "manually_edited": false
+    },
+    {
+      "line_index": 32,
+      "reading_order_index": 32,
+      "column": 0,
+      "position_in_column": 32,
+      "image_filename": "line_032.png",
+      "bbox": [
+        218,
+        1928,
+        368,
+        1965
+      ],
+      "padded_bbox": [
+        208.0,
+        1918.0,
+        378.0,
+        1975.0
+      ],
+      "score": 1.0,
+      "ocr_text": "RECORD OF SERVICE",
+      "ocr_text_pre_llm": "RECORD OF SERVICE",
+      "ocr_text_corrected": "",
+      "ocr_text_manual": "",
+      "confidence": 1.0,
+      "manually_edited": false
+    },
+    {
+      "line_index": 33,
+      "reading_order_index": 33,
+      "column": 0,
+      "position_in_column": 33,
+      "image_filename": "line_033.png",
+      "bbox": [
+        264,
+        1951,
+        540,
+        1989
+      ],
+      "padded_bbox": [
+        254.0,
+        1941.0,
+        550.0,
+        1999.0
+      ],
+      "score": 1.0,
+      "ocr_text": "URD. S. A. - HEW LONG,         14 monthe",
+      "ocr_text_pre_llm": "URD. S. A. - HEW LONG,         14 monthe",
+      "ocr_text_corrected": "",
+      "ocr_text_manual": "",
+      "confidence": 1.0,
+      "manually_edited": false
+    },
+    {
+      "line_index": 34,
+      "reading_order_index": 34,
+      "column": 0,
+      "position_in_column": 34,
+      "image_filename": "line_034.png",
+      "bbox": [
+        260,
+        1990,
+        583,
+        2028
+      ],
+      "padded_bbox": [
+        250.0,
+        1980.0,
+        593.0,
+        2038.0
+      ],
+      "score": 1.0,
+      "ocr_text": "IN WHAT COUNTRIES»     England,  France",
+      "ocr_text_pre_llm": "IN WHAT COUNTRIES»     England,  France",
+      "ocr_text_corrected": "",
+      "ocr_text_manual": "",
+      "confidence": 1.0,
+      "manually_edited": false
+    },
+    {
+      "line_index": 35,
+      "reading_order_index": 35,
+      "column": 0,
+      "position_in_column": 35,
+      "image_filename": "line_035.png",
+      "bbox": [
+        652,
+        1913,
+        1008,
+        1954
+      ],
+      "padded_bbox": [
+        642.0,
+        1903.0,
+        1018.0,
+        1964.0
+      ],
+      "score": 1.0,
+      "ocr_text": "DATE OF DISCHARGE                November 30,  1945",
+      "ocr_text_pre_llm": "DATE OF DISCHARGE                November 30,  1945",
+      "ocr_text_corrected": "",
+      "ocr_text_manual": "",
+      "confidence": 1.0,
+      "manually_edited": false
+    },
+    {
+      "line_index": 36,
+      "reading_order_index": 36,
+      "column": 0,
+      "position_in_column": 36,
+      "image_filename": "line_036.png",
+      "bbox": [
+        644,
+        1954,
+        949,
+        1993
+      ],
+      "padded_bbox": [
+        634.0,
+        1944.0,
+        959.0,
+        2003.0
+      ],
+      "score": 1.0,
+      "ocr_text": "Kow LONG?",
+      "ocr_text_pre_llm": "Kow LONG?",
+      "ocr_text_corrected": "",
+      "ocr_text_manual": "",
+      "confidence": 1.0,
+      "manually_edited": false
+    },
+    {
+      "line_index": 37,
+      "reading_order_index": 37,
+      "column": 0,
+      "position_in_column": 37,
+      "image_filename": "line_037.png",
+      "bbox": [
+        222,
+        2028,
+        1024,
+        2079
+      ],
+      "padded_bbox": [
+        212.0,
+        2018.0,
+        1034.0,
+        2089.0
+      ],
+      "score": 1.0,
+      "ocr_text": "monero»",
+      "ocr_text_pre_llm": "monero»",
+      "ocr_text_corrected": "",
+      "ocr_text_manual": "",
+      "confidence": 1.0,
+      "manually_edited": false
+    },
+    {
+      "line_index": 38,
+      "reading_order_index": 38,
+      "column": 0,
+      "position_in_column": 38,
+      "image_filename": "line_038.png",
+      "bbox": [
+        763,
+        1721,
+        864,
+        1753
+      ],
+      "padded_bbox": [
+        753.0,
+        1711.0,
+        874.0,
+        1763.0
+      ],
+      "score": 1.0,
+      "ocr_text": "MEMBER",
+      "ocr_text_pre_llm": "MEMBER",
+      "ocr_text_corrected": "",
+      "ocr_text_manual": "",
+      "confidence": 1.0,
+      "manually_edited": false
+    },
+    {
+      "line_index": 39,
+      "reading_order_index": 39,
+      "column": 0,
+      "position_in_column": 39,
+      "image_filename": "line_039.png",
+      "bbox": [
+        768,
+        1758,
+        863,
+        1796
+      ],
+      "padded_bbox": [
+        758.0,
+        1748.0,
+        873.0,
+        1806.0
+      ],
+      "score": 1.0,
+      "ocr_text": "MEMBER XI",
+      "ocr_text_pre_llm": "MEMBER XI",
+      "ocr_text_corrected": "",
+      "ocr_text_manual": "",
+      "confidence": 1.0,
+      "manually_edited": false
+    },
+    {
+      "line_index": 40,
+      "reading_order_index": 40,
+      "column": 0,
+      "position_in_column": 40,
+      "image_filename": "line_040.png",
+      "bbox": [
+        654,
+        1835,
+        911,
+        1877
+      ],
+      "padded_bbox": [
+        644.0,
+        1825.0,
+        921.0,
+        1887.0
+      ],
+      "score": 1.0,
+      "ocr_text": "RANK AND PROMOTIONS",
+      "ocr_text_pre_llm": "RANK AND PROMOTIONS",
+      "ocr_text_corrected": "",
+      "ocr_text_manual": "",
+      "confidence": 1.0,
+      "manually_edited": false
+    }
+  ],
+  "total_lines": 41,
+  "pipeline": "fallback_with_llm",
+  "gemini_processing": true,
+  "llm_corrected": false,
+  "manually_edited": false,
+  "timestamp": 1780427823.9350612,
+  "rerun_count": 1
+}
