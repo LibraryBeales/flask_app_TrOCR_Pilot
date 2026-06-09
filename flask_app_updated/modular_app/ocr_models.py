@@ -491,7 +491,12 @@ class OCRModelsService:
 
                 print("Running Kraken baseline segmentation...")
                 pil_image = PILImage.open(image_path).convert('RGB')
-                result = blla.segment(pil_image)
+                try:
+                    result = blla.segment(pil_image, device='cuda')
+                    print("Kraken running on GPU")
+                except TypeError:
+                    result = blla.segment(pil_image)
+                    print("Kraken running on CPU (GPU not supported in this version)")
 
                 boxes = []
                 for line in result.lines:

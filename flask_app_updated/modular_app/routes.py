@@ -170,18 +170,26 @@ def create_routes(config, ocr_processing_service, llm_service) -> Blueprint:
 
     @routes_bp.route('/image/<filename>')
     def get_image(filename):
-        """Serve images from upload folder"""
+        """Serve images from upload folder with no-cache headers"""
         try:
-            return send_from_directory(config.upload_folder, filename)
+            response = send_from_directory(config.upload_folder, filename)
+            response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate'
+            response.headers['Pragma'] = 'no-cache'
+            response.headers['Expires'] = '0'
+            return response
         except Exception as e:
             print(f"Error serving image {filename}: {e}")
             return jsonify({'error': 'Image not found'}), 404
 
     @routes_bp.route('/line_segment/<filename>')
     def get_line_segment(filename):
-        """Serve line segment images"""
+        """Serve line segment images with no-cache headers"""
         try:
-            return send_from_directory(config.line_segments_folder, filename)
+            response = send_from_directory(config.line_segments_folder, filename)
+            response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate'
+            response.headers['Pragma'] = 'no-cache'
+            response.headers['Expires'] = '0'
+            return response
         except Exception as e:
             print(f"Error serving line segment {filename}: {e}")
             return jsonify({'error': 'Line segment not found'}), 404
@@ -611,8 +619,9 @@ def create_routes(config, ocr_processing_service, llm_service) -> Blueprint:
             for segment in segments:
                 editable_lines.append({
                     'line_index': segment.get('line_index', 0),
+                    'image_filename': segment.get('image_filename', ''),
                     'original': segment.get('ocr_text', ''),
-                    'pre_llm': segment.get('ocr_text_pre_llm',
+                    'pre_llm': segment.get('ocr_text_pre_llm', 
                                segment.get('ocr_text', '')),
                     'corrected': segment.get('ocr_text_corrected',
                                  segment.get('ocr_text', '')),

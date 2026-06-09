@@ -55,29 +55,35 @@ class LLMService:
         return chunks
     
     def create_correction_prompt(self, text: str, context: str = "") -> str:
-        """Create structured prompt for text correction with context"""
         context_section = ""
         if context:
             context_section = f"""
-Previous context:
+Previous context from this document:
 {context}
 
 """
-        
-        return f"""
-Correct the following Spanish OCR text while preserving original grammar and style.
-Only fix orthographic errors, punctuation, and obvious OCR mistakes.
+
+        return f"""You are a specialist in transcribing 17th and 18th century Spanish historical documents.
+You are correcting OCR output from scanned historical manuscripts and printed documents.
+
+Common OCR errors in historical Spanish documents include:
+- Long s (ſ) misread as f or i
+- u/v confusion (vn for un, vna for una)
+- Abbreviation marks misread as random characters
+- Ligatures split incorrectly
+- Period-specific spellings: theologia, philosophia, Christo
+- Latin phrases mixed with Spanish
+- Roman numerals misread
+- Accents missing or misplaced
 {context_section}
-Text to correct:
+Correct the following OCR lines. Fix only genuine OCR errors.
+Preserve original 17th/18th century Spanish spelling conventions.
+Do not modernise archaic spellings.
+Return ONLY the corrected numbered lines.
+
 {text}
 
-Instructions:
-- Fix spelling errors and OCR artifacts
-- Preserve historical language patterns  
-- Maintain original formatting
-- Return ONLY the corrected text
-
-Corrected text:
+Corrected lines:
 """
     
     def try_gemini_correction(self, text: str, context: str = "", retries: int = 2) -> Tuple[str, str]:

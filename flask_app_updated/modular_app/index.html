@@ -695,58 +695,119 @@
             </div>
             
             <div class="inference-panel">
-                <div class="tab-container">
-                    <div class="tab-buttons">
-                        <button class="tab-button active" onclick="switchTab('full-text')">Full Text</button>
-                        <button class="tab-button" onclick="switchTab('line-segments')">Line Segments</button>
-                    </div>
-                    
-                    <div id="full-text-tab" class="tab-content active">
-                        <div class="ocr-results-section">
-                            <h2>🤖 Full Text OCR Results</h2>
-                            <div class="full-text-section">
-                                <h3>📄 Original OCR Output</h3>
-                                <div class="full-text-content" id="originalTextContent">
-                                    <div id="originalTextDisplay">No OCR data available</div>
-                                </div>
-                            </div>
-                            <div class="full-text-section">
-                                <h3>✏️ Corrected Text</h3>
-                                <div class="text-zoom-controls">
-                                    <span>Zoom:</span>
-                                    <button type="button" id="decreaseTextZoom">A-</button>
-                                    <button type="button" id="increaseTextZoom">A+</button>
-                                </div>
-                                    <div class="full-text-content" id="correctedTextContent">
-                                        <div id="correctedText" class="corrected-text" contenteditable="true" spellcheck="true" style="min-height: 180px;"></div>
-                                    </div>
-                            </div>
-                            <div class="section-actions">
-                                <button id="saveCorrectionBtn" class="btn-success">💾 Save Correction</button>
-                                <button id="resetCorrectionBtn" class="btn-warning">↩️ Reset to Original</button>
+                <div style="padding: 15px;">
+
+                    <h3 style="margin-top:0; color: var(--purple-deep);
+                            border-bottom: 2px solid var(--purple-main);
+                            padding-bottom: 10px;">
+                        Processing Status
+                    </h3>
+
+                    <div id="statusPanel" style="display:none;">
+
+                        <div style="background: var(--bg-white); border-radius: 8px;
+                                    padding: 15px; margin-bottom: 15px;
+                                    border: 1px solid var(--purple-light);">
+                            <div style="font-size: 13px; color: #666;
+                                        margin-bottom: 5px;">Current Page</div>
+                            <div id="statusFilename"
+                                style="font-size: 12px; color: var(--purple-main);
+                                        word-break: break-all; font-family: monospace;">
                             </div>
                         </div>
-                    </div>
-                    
-                    <div id="line-segments-tab" class="tab-content">
-                        <div class="ocr-results-section">
-                            <h2>📝 Line-by-Line OCR Results</h2>
-                            <div class="line-segments-section">
-                                <h3>🔍 Individual Line Segments</h3>
-                                <div class="inference-stats" id="lineSegmentsStats">
-                                    No line segments available
+
+                        <div style="background: var(--bg-white); border-radius: 8px;
+                                    padding: 15px; margin-bottom: 15px;
+                                    border: 1px solid var(--purple-light);">
+                            <div style="font-size: 13px; color: #666;
+                                        margin-bottom: 8px;">Lines Detected</div>
+                            <div id="statusLineCount"
+                                style="font-size: 36px; font-weight: bold;
+                                        color: var(--purple-deep); text-align: center;">
+                                —
+                            </div>
+                        </div>
+
+                        <div style="background: var(--bg-white); border-radius: 8px;
+                                    padding: 15px; margin-bottom: 15px;
+                                    border: 1px solid var(--purple-light);">
+                            <div style="font-size: 13px; color: #666;
+                                        margin-bottom: 12px;">Pipeline Status</div>
+
+                            <div style="display: flex; align-items: center;
+                                        gap: 12px; margin-bottom: 12px;">
+                                <div id="lightKraken"
+                                    style="width: 20px; height: 20px; border-radius: 50%;
+                                            background: #ccc; flex-shrink: 0;
+                                            box-shadow: 0 0 6px rgba(0,0,0,0.2);">
                                 </div>
-                                <div class="line-segments-container" id="lineSegmentsContainer">
-                                    <div style="padding: 20px; text-align: center; color: #666;">
-                                        Upload an image to see line segments and OCR results
+                                <div>
+                                    <div style="font-weight: bold; font-size: 14px;">
+                                        Kraken Segmentation
+                                    </div>
+                                    <div id="labelKraken"
+                                        style="font-size: 12px; color: #888;">
+                                        Waiting
                                     </div>
                                 </div>
                             </div>
-                            <div class="section-actions">
-                                <button id="saveAllLinesBtn" class="btn-success">💾 Save All Line Corrections</button>
-                                <button id="resetAllLinesBtn" class="btn-warning">↩️ Reset All Lines</button>
+
+                            <div style="display: flex; align-items: center;
+                                        gap: 12px; margin-bottom: 12px;">
+                                <div id="lightTrOCR"
+                                    style="width: 20px; height: 20px; border-radius: 50%;
+                                            background: #ccc; flex-shrink: 0;
+                                            box-shadow: 0 0 6px rgba(0,0,0,0.2);">
+                                </div>
+                                <div>
+                                    <div style="font-weight: bold; font-size: 14px;">
+                                        TrOCR Recognition
+                                    </div>
+                                    <div id="labelTrOCR"
+                                        style="font-size: 12px; color: #888;">
+                                        Waiting
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; align-items: center;
+                                        gap: 12px;">
+                                <div id="lightLLM"
+                                    style="width: 20px; height: 20px; border-radius: 50%;
+                                            background: #ccc; flex-shrink: 0;
+                                            box-shadow: 0 0 6px rgba(0,0,0,0.2);">
+                                </div>
+                                <div>
+                                    <div style="font-weight: bold; font-size: 14px;">
+                                        LLM Correction
+                                    </div>
+                                    <div id="labelLLM"
+                                        style="font-size: 12px; color: #888;">
+                                        Waiting
+                                    </div>
+                                </div>
                             </div>
                         </div>
+
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            <button onclick="openInEditor()"
+                                    id="openEditorBtn" disabled
+                                    style="flex: 1;">
+                                ✏️ Edit in Editor
+                            </button>
+                            <button onclick="downloadCurrentText()"
+                                    id="downloadTxtBtn" disabled
+                                    style="flex: 1;">
+                                ⬇️ Download TXT
+                            </button>
+                        </div>
+
+                    </div>
+
+                    <div id="statusWaiting"
+                        style="text-align: center; padding: 40px 20px; color: #aaa;">
+                        <div style="font-size: 48px; margin-bottom: 10px;">📄</div>
+                        <div>Upload an image to begin</div>
                     </div>
                 </div>
             </div>
@@ -811,12 +872,12 @@
             document.getElementById('rerunInferenceBtn').addEventListener('click', rerunInference);
             
             // Inference controls
-            document.getElementById('saveCorrectionBtn').addEventListener('click', saveCorrection);
-            document.getElementById('resetCorrectionBtn').addEventListener('click', resetCorrection);
+            // document.getElementById('saveCorrectionBtn').addEventListener('click', saveCorrection);
+            //document.getElementById('resetCorrectionBtn').addEventListener('click', resetCorrection);
             
             // Line segment controls
-            document.getElementById('saveAllLinesBtn').addEventListener('click', saveAllLineCorrections);
-            document.getElementById('resetAllLinesBtn').addEventListener('click', resetAllLineCorrections);
+            //document.getElementById('saveAllLinesBtn').addEventListener('click', saveAllLineCorrections);
+            //document.getElementById('resetAllLinesBtn').addEventListener('click', resetAllLineCorrections);
             
             // Image split toggle
             document.getElementById('splitImageToggle').addEventListener('change', function() {
@@ -999,42 +1060,123 @@
         }
         
         function loadInferenceData() {
-            if (!currentImageName) return;
-            
-            fetch(`/get_inference/${currentImageName}`)
+            if (!currentImageName) return
+
+            const cacheBust = '?t=' + Date.now()
+
+            fetch(`/get_inference/${currentImageName}${cacheBust}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.error) {
-                        document.getElementById('originalTextDisplay').textContent = 'No OCR data available';
-                        document.getElementById('correctedText').value = '';
-                        document.getElementById('lineSegmentsContainer').innerHTML = '<div style="padding: 20px; text-align: center; color: #666;">No line segments available</div>';
-                        document.getElementById('lineSegmentsStats').textContent = 'No line segments available';
-                    } else {
-                        currentInferenceData = data;
-                        
-                        // Display combined full text
-                        const fullText = data.original_text || '';
-                        document.getElementById('originalTextDisplay').textContent = fullText;
-                        document.getElementById('correctedText').innerText = data.corrected_text || fullText;                        
-                        // Update line segments
-                        if (data.line_segments && data.line_segments.length > 0) {
-                            currentLineSegments = data.line_segments;
-                            updateLineSegmentsDisplay();
-                            document.getElementById('lineSegmentsStats').textContent = `Found ${data.total_lines} line segments`;
-                        } else {
-                            document.getElementById('lineSegmentsStats').textContent = 'No line segments available';
-                            document.getElementById('lineSegmentsContainer').innerHTML = '<div style="padding: 20px; text-align: center; color: #666;">No line segments available</div>';
-                        }
-                        // Update PDF page indicator
-                        if (isPdf && typeof data.page_index === 'number' && typeof data.total_pages === 'number') {
-                            currentPageIndex = data.page_index;
-                            updatePageIndicator(data.page_index, data.total_pages);
-                        }
+                        resetStatusLights()
+                        return
                     }
+
+                    currentInferenceData = data
+                    currentLineSegments = data.line_segments || []
+
+                    // Show status panel
+                    document.getElementById('statusWaiting').style.display = 'none'
+                    document.getElementById('statusPanel').style.display = 'block'
+
+                    // Filename
+                    document.getElementById('statusFilename').textContent =
+                        currentImageName
+
+                    // Line count
+                    const lineCount = data.total_lines || 0
+                    document.getElementById('statusLineCount').textContent =
+                        lineCount > 0 ? lineCount : '—'
+
+                    // Kraken light
+                    const hasLines = lineCount > 0
+                    setLight('lightKraken', 'labelKraken',
+                        hasLines,
+                        hasLines ? `${lineCount} lines detected` : 'No lines detected'
+                    )
+
+                    // TrOCR light
+                    const hasOcr = currentLineSegments.some(
+                        s => s.ocr_text && s.ocr_text.trim()
+                    )
+                    setLight('lightTrOCR', 'labelTrOCR',
+                        hasOcr,
+                        hasOcr ? 'Text recognised' : 'No text recognised'
+                    )
+
+                    // LLM light
+                    const hasLlm = currentLineSegments.some(
+                        s => s.ocr_text_corrected && s.ocr_text_corrected.trim()
+                    )
+                    setLight('lightLLM', 'labelLLM',
+                        hasLlm,
+                        hasLlm ? 'Correction applied' : 'No correction available'
+                    )
+
+                    // Enable buttons
+                    const editorBtn = document.getElementById('openEditorBtn')
+                    const downloadBtn = document.getElementById('downloadTxtBtn')
+                    if (editorBtn) editorBtn.disabled = false
+                    if (downloadBtn) downloadBtn.disabled = false
                 })
                 .catch(error => {
-                    console.error('Error loading inference:', error);
-                });
+                    console.error('Error loading inference:', error)
+                    resetStatusLights()
+                })
+        }
+
+        function setLight(lightId, labelId, isGreen, labelText) {
+            const light = document.getElementById(lightId)
+            const label = document.getElementById(labelId)
+            if (light) {
+                light.style.background = isGreen ? '#27ae60' : '#e74c3c'
+                light.style.boxShadow = isGreen
+                    ? '0 0 8px rgba(39,174,96,0.6)'
+                    : '0 0 8px rgba(231,76,60,0.6)'
+            }
+            if (label) label.textContent = labelText
+        }
+
+        function resetStatusLights() {
+            ['lightKraken', 'lightTrOCR', 'lightLLM'].forEach(id => {
+                const el = document.getElementById(id)
+                if (el) {
+                    el.style.background = '#ccc'
+                    el.style.boxShadow = '0 0 6px rgba(0,0,0,0.2)'
+                }
+            })
+            ;['labelKraken', 'labelTrOCR', 'labelLLM'].forEach(id => {
+                const el = document.getElementById(id)
+                if (el) el.textContent = 'Waiting'
+            })
+            document.getElementById('statusLineCount').textContent = '—'
+        }
+
+        function setLight(lightId, labelId, isGreen, labelText) {
+            const light = document.getElementById(lightId)
+            const label = document.getElementById(labelId)
+            if (light) {
+                light.style.background = isGreen ? '#27ae60' : '#e74c3c'
+                light.style.boxShadow = isGreen
+                    ? '0 0 8px rgba(39,174,96,0.6)'
+                    : '0 0 8px rgba(231,76,60,0.6)'
+            }
+            if (label) label.textContent = labelText
+        }
+
+        function resetStatusLights() {
+            ['lightKraken', 'lightTrOCR', 'lightLLM'].forEach(id => {
+                const el = document.getElementById(id)
+                if (el) {
+                    el.style.background = '#ccc'
+                    el.style.boxShadow = '0 0 6px rgba(0,0,0,0.2)'
+                }
+            })
+            ;['labelKraken', 'labelTrOCR', 'labelLLM'].forEach(id => {
+                const el = document.getElementById(id)
+                if (el) el.textContent = 'Waiting'
+            })
+            document.getElementById('statusLineCount').textContent = '—'
         }
         
         function updateLineSegmentsDisplay() {
@@ -1527,33 +1669,30 @@
         }
         
         function loadCurrentImage() {
-            if (!currentImageName) return;
-            const imgUrl = `/image/${currentImageName}`;
-            
+            if (!currentImageName) return
+            const cacheBust = '?t=' + Date.now()
+            const imgUrl = `/image/${currentImageName}${cacheBust}`
+
             fabric.Image.fromURL(imgUrl, img => {
-                canvas.clear();
-                
-                // Preserve aspect ratio and resize canvas to fit image with larger viewport
-                const maxWidth = 1600;
-                const maxHeight = 1000;
-                
-                let scaleX = maxWidth / img.width;
-                let scaleY = maxHeight / img.height;
-                let scale = Math.min(scaleX, scaleY);
-                
-                const newWidth = img.width * scale;
-                const newHeight = img.height * scale;
-                
-                canvas.setDimensions({
-                    width: newWidth,
-                    height: newHeight
-                });
-                
+                canvas.clear()
+
+                const maxWidth = 1600
+                const maxHeight = 1000
+
+                let scaleX = maxWidth / img.width
+                let scaleY = maxHeight / img.height
+                let scale = Math.min(scaleX, scaleY)
+
+                const newWidth = img.width * scale
+                const newHeight = img.height * scale
+
+                canvas.setDimensions({ width: newWidth, height: newHeight })
+
                 canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas), {
                     scaleX: scale,
                     scaleY: scale
-                });
-            });
+                })
+            })
         }
 
         // Corrected text zoom controls

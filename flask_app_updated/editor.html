@@ -291,11 +291,12 @@
     <table>
         <thead>
             <tr>
-                <th>#</th>
+                <th style="width:50px;">#</th>
+                <th style="width:180px;">Page Image</th>
                 <th>Raw TrOCR Output</th>
                 <th>LLM Corrected</th>
                 <th>Manual Edit (editable)</th>
-                <th>Status</th>
+                <th style="width:80px;">Status</th>
             </tr>
         </thead>
         <tbody id="lineRows"></tbody>
@@ -505,12 +506,14 @@
     function renderLines(lines) {
         const tbody = document.getElementById('lineRows')
         tbody.innerHTML = ''
+        const cacheBust = '?t=' + Date.now()
 
         lines.forEach((line, i) => {
-            const raw    = line.original  || ''
-            const llm    = line.corrected || ''
-            const manual = line.manual    || llm
+            const raw       = line.original  || ''
+            const llm       = line.corrected || ''
+            const manual    = line.manual    || llm
             const wasEdited = line.manually_edited
+            const imgFile   = line.image_filename || ''
 
             const tr = document.createElement('tr')
             tr.id = `row-${i}`
@@ -518,6 +521,19 @@
 
             tr.innerHTML = `
                 <td class="line-num">${line.line_index + 1}</td>
+                <td style="width:180px; padding:4px; vertical-align:middle; text-align:center;">
+                    ${imgFile
+                        ? `<img src="/line_segment/${encodeURIComponent(imgFile)}${cacheBust}"
+                                alt="Line ${line.line_index + 1}"
+                                style="max-width:170px; max-height:60px;
+                                    object-fit:contain; border-radius:3px;
+                                    border:1px solid #ddd; background:#fff;"
+                                onerror="this.style.display='none';
+                                        this.nextElementSibling.style.display='block';">
+                        <span style="display:none; font-size:11px; color:#aaa;">No image</span>`
+                        : `<span style="font-size:11px; color:#aaa;">No image</span>`
+                    }
+                </td>
                 <td>
                     <div class="text-cell raw-cell ${raw ? '' : 'empty-cell'}">
                         ${escHtml(raw) || '(empty)'}
@@ -530,15 +546,15 @@
                 </td>
                 <td>
                     <textarea class="edit-input"
-                              id="edit-${i}"
-                              rows="2"
-                              oninput="markEdited(${i})"
-                              onkeydown="handleKey(event,${i})"
+                            id="edit-${i}"
+                            rows="2"
+                            oninput="markEdited(${i})"
+                            onkeydown="handleKey(event,${i})"
                     >${escHtml(manual)}</textarea>
                 </td>
                 <td>
                     <span class="status-badge ${wasEdited ? 'edited-badge' : ''}"
-                          id="badge-${i}">
+                        id="badge-${i}">
                         ${wasEdited ? 'edited' : (line.correction_status || 'none')}
                     </span>
                 </td>
