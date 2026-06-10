@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preprocessing Test</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+            min-height: 100vh;
+        }
+
+        header {
+            background: #16213e;
+            padding: 15px 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            border-bottom: 2px solid #0f3460;
+        }
+
+        header h1 {
+            font-size: 20px;
+            color: #e94560;
+            margin-right: 10px;
+        }
+
+        .btn {
+            padding: 8px 18px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: opacity 0.2s;
+        }
+
+        .btn:hover { opacity: 0.85; }
+        .btn-red    { background: #e94560; color: white; }
+        .btn-blue   { background: #0f3460; color: white; }
+        .btn-green  { background: #27ae60; color: white; }
+        .btn-purple { background: #8e44ad; color: white; }
+
+        .upload-zone {
+            border: 3px dashed #0f3460;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            margin: 25px;
+            cursor: pointer;
+            transition: border-color 0.3s, background 0.3s;
+            background: #16213e;
+        }
+
+        .upload-zone:hover,
+        .upload-zone.dragover {
+            border-color: #e94560;
+            background: #1a1a2e;
+        }
+
+        .upload-zone p {
+            color: #aaa;
+            font-size: 15px;
+            margin-top: 10px;
+        }
+
+        .upload-zone .icon {
+            font-size: 48px;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        #message {
+            margin: 0 25px;
+            padding: 12px 18px;
+            border-radius: 8px;
+            font-size: 14px;
+            display: none;
+        }
+
+        #message.success { background: #1e3a2f; color: #a3e635; }
+        #message.error   { background: #3a1e1e; color: #ff6b6b; }
+        #message.info    { background: #1e2a3a; color: #5bb6f9; }
+
+        .progress-bar-wrap {
+            margin: 15px 25px;
+            background: #16213e;
+            border-radius: 8px;
+            height: 24px;
+            overflow: hidden;
+            display: none;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #e94560, #8e44ad);
+            width: 0%;
+            transition: width 0.4s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 20px;
+            padding: 25px;
+        }
+
+        .result-card {
+            background: #16213e;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 2px solid #0f3460;
+            transition: border-color 0.2s, transform 0.2s;
+        }
+
+        .result-card:hover {
+            border-color: #e94560;
+            transform: translateY(-2px);
+        }
+
+        .result-card.selected {
+            border-color: #27ae60;
+            box-shadow: 0 0 16px rgba(39,174,96,0.4);
+        }
+
+        .card-header {
+            background: #0f3460;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            font-weight: bold;
+            font-size: 15px;
+            color: #e94560;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .card-actions button {
+            padding: 4px 10px;
+            font-size: 12px;
+            border-radius: 4px;
+        }
+
+        .card-img-wrap {
+            position: relative;
+            background: #000;
+            overflow: hidden;
+            cursor: zoom-in;
+        }
+
+        .card-img {
+            width: 100%;
+            height: 280px;
+            object-fit: contain;
+            display: block;
+            transition: opacity 0.2s;
+        }
+
+        .card-img:hover { opacity: 0.9; }
+
+        .card-footer {
+            padding: 10px 16px;
+            font-size: 12px;
+            color: #888;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .badge-selected {
+            background: #27ae60;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            display: none;
+        }
+
+        .result-card.selected .badge-selected {
+            display: inline-block;
+        }
+
+        .selected-summary {
+            margin: 0 25px 20px;
+            padding: 15px 20px;
+            background: #1e3a2f;
+            border-radius: 8px;
+            border: 1px solid #27ae60;
+            display: none;
+        }
+
+        .selected-summary h3 {
+            color: #a3e635;
+            margin-bottom: 8px;
+            font-size: 15px;
+        }
+
+        .selected-summary p {
+            font-size: 13px;
+            color: #ccc;
+        }
+
+        .instructions {
+            margin: 20px 25px 0;
+            padding: 15px 20px;
+            background: #16213e;
+            border-radius: 8px;
+            border-left: 4px solid #e94560;
+            font-size: 13px;
+            color: #aaa;
+            line-height: 1.6;
+        }
+
+        .instructions strong { color: #eee; }
+
+        /* Lightbox */
+        #lightbox {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.92);
+            z-index: 9999;
+            overflow: auto;
+        }
+
+        #lightbox.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        #lightboxImg {
+            max-width: 92vw;
+            max-height: 80vh;
+            border: 2px solid #333;
+            background: white;
+            border-radius: 6px;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.8);
+            transition: transform 0.15s;
+            transform-origin: center center;
+            cursor: grab;
+        }
+
+        #lightboxImg:active { cursor: grabbing; }
+
+        #lightboxBar {
+            display: flex;
+            gap: 10px;
+            margin-top: 18px;
+            align-items: center;
+        }
+
+        #lightboxBar button {
+            background: rgba(255,255,255,0.12);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.25);
+            padding: 8px 18px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        #lightboxBar button:hover { background: rgba(255,255,255,0.25); }
+
+        #lightboxZoom {
+            color: white;
+            font-size: 13px;
+            min-width: 55px;
+            text-align: center;
+        }
+
+        #lightboxTitle {
+            color: #e94560;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+
+        #lightboxClose {
+            position: fixed;
+            top: 16px; right: 22px;
+            color: white;
+            font-size: 30px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            line-height: 1;
+            padding: 4px 10px;
+            border-radius: 4px;
+            z-index: 10000;
+        }
+
+        #lightboxClose:hover { background: rgba(255,255,255,0.15); }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 25px;
+            color: #555;
+        }
+
+        .empty-state .icon { font-size: 64px; display: block; margin-bottom: 15px; }
+        .empty-state p { font-size: 16px; }
+    </style>
+</head>
+<body>
+
+<!-- Lightbox -->
+<div id="lightbox" onclick="lbBackdrop(event)">
+    <button id="lightboxClose" onclick="lbClose()">✕</button>
+    <div id="lightboxTitle"></div>
+    <img id="lightboxImg" src="" alt="Preview">
+    <div id="lightboxBar">
+        <button onclick="lbZoomOut(event)">−</button>
+        <span id="lightboxZoom">100%</span>
+        <button onclick="lbZoomIn(event)">+</button>
+        <button onclick="lbReset(event)">Reset</button>
+        <button onclick="lbClose()" style="background:#e94560;">Close</button>
+    </div>
+</div>
+
+<header>
+    <h1>🧪 Preprocessing Test</h1>
+    <label for="testFileInput" class="btn btn-red" style="cursor:pointer;">
+        📁 Upload Image to Test
+    </label>
+    <input type="file" id="testFileInput" accept="image/*" style="display:none;">
+    <button class="btn btn-green" id="useSelectedBtn"
+            onclick="useSelected()" style="display:none;">
+        ✅ Use Selected Method
+    </button>
+    <a href="/" class="btn btn-blue">← Back to Main</a>
+</header>
+
+<div id="message"></div>
+
+<div class="progress-bar-wrap" id="progressWrap">
+    <div class="progress-bar" id="progressBar">Processing...</div>
+</div>
+
+<div id="emptyState" class="empty-state">
+    <span class="icon">🔬</span>
+    <p>Upload an image to compare all preprocessing methods side by side.</p>
+    <p style="margin-top:10px; font-size:13px; color:#444;">
+        Click any result image to zoom in. Click a card to select it as your preferred method.
+    </p>
+</div>
+
+<div class="instructions" id="instructions" style="display:none;">
+    <strong>How to use:</strong>
+    Compare the five versions below. Click any image to zoom in for a closer look.
+    Click a card to mark it as your preferred method — this highlights it in green.
+    When you have decided, click <strong>Use Selected Method</strong> in the header
+    to apply that method to your uploads.
+</div>
+
+<div class="selected-summary" id="selectedSummary">
+    <h3>✅ Selected Method</h3>
+    <p id="selectedSummaryText"></p>
+</div>
+
+<div class="results-grid" id="resultsGrid"></div>
+
+<script>
+    let lbZoomLevel = 1
+    let selectedMethod = null
+    let originalFilename = null
+
+    const METHOD_DESCRIPTIONS = {
+        original:     'Simple greyscale conversion. Use as a baseline for comparison.',
+        conservative: 'Gentle enhancement using best colour channel, denoising, CLAHE contrast, and sharpening. Best starting point for most documents.',
+        sauvola:      'Sauvola adaptive binarisation. Produces pure black and white. Best for heavy bleed-through and uneven lighting.',
+        adaptive:     'Adaptive threshold binarisation. Faster than Sauvola, good middle ground for moderate bleed-through.',
+        nobleed:      'Channel arithmetic to suppress warm-toned bleed-through. Best when bleed-through is the dominant problem.'
+    }
+
+    // ── File upload ────────────────────────────────────────────
+    document.getElementById('testFileInput')
+        .addEventListener('change', function(e) {
+            const file = e.target.files[0]
+            if (!file) return
+            runTest(file)
+            e.target.value = ''
+        })
+
+    // Drag and drop on empty state
+    const emptyState = document.getElementById('emptyState')
+    emptyState.addEventListener('dragover', e => {
+        e.preventDefault()
+        emptyState.classList.add('dragover')
+    })
+    emptyState.addEventListener('dragleave', () => {
+        emptyState.classList.remove('dragover')
+    })
+    emptyState.addEventListener('drop', e => {
+        e.preventDefault()
+        emptyState.classList.remove('dragover')
+        const file = e.dataTransfer.files[0]
+        if (file && file.type.startsWith('image/')) runTest(file)
+    })
+
+    function runTest(file) {
+        showMessage(`Processing ${file.name} with all methods...`, 'info')
+        document.getElementById('progressWrap').style.display = 'block'
+        document.getElementById('progressBar').style.width = '15%'
+        document.getElementById('emptyState').style.display = 'none'
+        document.getElementById('instructions').style.display = 'none'
+        document.getElementById('resultsGrid').innerHTML = ''
+        document.getElementById('selectedSummary').style.display = 'none'
+        selectedMethod = null
+        document.getElementById('useSelectedBtn').style.display = 'none'
+
+        const formData = new FormData()
+        formData.append('file', file)
+
+        // Animate progress
+        let prog = 15
+        const interval = setInterval(() => {
+            prog = Math.min(prog + 3, 88)
+            document.getElementById('progressBar').style.width = prog + '%'
+        }, 800)
+
+        fetch('/preprocess_test', { method: 'POST', body: formData })
+            .then(r => r.json())
+            .then(data => {
+                clearInterval(interval)
+                document.getElementById('progressBar').style.width = '100%'
+                setTimeout(() => {
+                    document.getElementById('progressWrap').style.display = 'none'
+                }, 500)
+
+                if (data.success) {
+                    originalFilename = data.original_filename
+                    renderResults(data.results)
+                    document.getElementById('instructions').style.display = 'block'
+                    showMessage(`All methods applied to ${file.name}`, 'success')
+                } else {
+                    showMessage('Error: ' + data.error, 'error')
+                    document.getElementById('emptyState').style.display = 'block'
+                }
+            })
+            .catch(e => {
+                clearInterval(interval)
+                document.getElementById('progressWrap').style.display = 'none'
+                showMessage('Failed: ' + e, 'error')
+                document.getElementById('emptyState').style.display = 'block'
+            })
+    }
+
+    function renderResults(results) {
+        const grid = document.getElementById('resultsGrid')
+        grid.innerHTML = ''
+        const cb = '?t=' + Date.now()
+
+        const order = ['original', 'conservative', 'sauvola', 'adaptive', 'nobleed']
+
+        order.forEach(key => {
+            const r = results[key]
+            if (!r) return
+
+            const card = document.createElement('div')
+            card.className = 'result-card'
+            card.id = `card-${key}`
+            card.onclick = () => selectCard(key, r.label)
+
+            if (!r.success) {
+                card.innerHTML = `
+                    <div class="card-header">
+                        <span class="card-title">${r.label}</span>
+                    </div>
+                    <div style="padding:30px; text-align:center; color:#e74c3c;">
+                        Failed: ${r.error || 'Unknown error'}
+                    </div>
+                `
+                grid.appendChild(card)
+                return
+            }
+
+            const imgSrc = `/preprocessed_image/test/${r.filename}${cb}`
+
+            card.innerHTML = `
+                <div class="card-header">
+                    <span class="card-title">${r.label}</span>
+                    <div class="card-actions">
+                        <button class="btn btn-blue"
+                                onclick="event.stopPropagation(); lbOpen('${imgSrc}', '${r.label}')">
+                            🔍 Zoom
+                        </button>
+                        <button class="btn btn-green"
+                                onclick="event.stopPropagation(); selectCard('${key}', '${r.label}')">
+                            ✅ Select
+                        </button>
+                    </div>
+                </div>
+                <div class="card-img-wrap"
+                     onclick="event.stopPropagation(); lbOpen('${imgSrc}', '${r.label}')">
+                    <img src="${imgSrc}"
+                         class="card-img"
+                         alt="${r.label}"
+                         onerror="this.parentElement.innerHTML='<div style=padding:40px;text-align:center;color:#666>Image failed to load</div>'">
+                </div>
+                <div class="card-footer">
+                    <span>${METHOD_DESCRIPTIONS[key] || ''}</span>
+                    <span class="badge-selected">SELECTED</span>
+                </div>
+            `
+            grid.appendChild(card)
+        })
+    }
+
+    function selectCard(methodKey, methodLabel) {
+        // Deselect all
+        document.querySelectorAll('.result-card').forEach(c => {
+            c.classList.remove('selected')
+        })
+
+        // Select this one
+        const card = document.getElementById(`card-${methodKey}`)
+        if (card) card.classList.add('selected')
+
+        selectedMethod = methodKey
+
+        // Show summary
+        const summary = document.getElementById('selectedSummary')
+        summary.style.display = 'block'
+        document.getElementById('selectedSummaryText').textContent =
+            `${methodLabel} — ${METHOD_DESCRIPTIONS[methodKey] || ''} ` +
+            `Click "Use Selected Method" in the header to apply this to your uploads.`
+
+        // Show use button
+        document.getElementById('useSelectedBtn').style.display = 'inline-block'
+
+        showMessage(`Selected: ${methodLabel}`, 'success')
+    }
+
+    function useSelected() {
+        if (!selectedMethod) {
+            showMessage('Please select a method first', 'error')
+            return
+        }
+
+        if (!confirm(
+            `Apply "${selectedMethod}" preprocessing to all images in the uploads folder?\n\n` +
+            `Preprocessed images will be saved to uploads-preprocessed/.`
+        )) return
+
+        showMessage('Applying to all uploads...', 'info')
+
+        fetch('/preprocess_directory', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ method: selectedMethod })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                showMessage(
+                    `Done! ${data.label} applied to ${data.processed_count} images. ` +
+                    `Saved to uploads-preprocessed/`,
+                    'success'
+                )
+            } else {
+                showMessage('Error: ' + data.error, 'error')
+            }
+        })
+        .catch(e => showMessage('Failed: ' + e, 'error'))
+    }
+
+    // ── Lightbox ───────────────────────────────────────────────
+    function lbOpen(src, title) {
+        lbZoomLevel = 1
+        document.getElementById('lightboxImg').src = src
+        document.getElementById('lightboxImg').style.transform = 'scale(1)'
+        document.getElementById('lightboxTitle').textContent = title
+        document.getElementById('lightboxZoom').textContent = '100%'
+        document.getElementById('lightbox').classList.add('active')
+        document.body.style.overflow = 'hidden'
+    }
+
+    function lbClose() {
+        document.getElementById('lightbox').classList.remove('active')
+        document.body.style.overflow = ''
+    }
+
+    function lbBackdrop(e) {
+        if (e.target === document.getElementById('lightbox')) lbClose()
+    }
+
+    function lbZoomIn(e) {
+        e.stopPropagation()
+        lbZoomLevel = Math.min(lbZoomLevel + 0.25, 6)
+        lbApply()
+    }
+
+    function lbZoomOut(e) {
+        e.stopPropagation()
+        lbZoomLevel = Math.max(lbZoomLevel - 0.25, 0.25)
+        lbApply()
+    }
+
+    function lbReset(e) {
+        e.stopPropagation()
+        lbZoomLevel = 1
+        lbApply()
+    }
+
+    function lbApply() {
+        document.getElementById('lightboxImg').style.transform =
+            `scale(${lbZoomLevel})`
+        document.getElementById('lightboxZoom').textContent =
+            Math.round(lbZoomLevel * 100) + '%'
+    }
+
+    document.addEventListener('keydown', e => {
+        const lb = document.getElementById('lightbox')
+        if (!lb.classList.contains('active')) return
+        if (e.key === 'Escape') lbClose()
+        if (e.key === '+' || e.key === '=') { lbZoomLevel = Math.min(lbZoomLevel + 0.25, 6); lbApply() }
+        if (e.key === '-') { lbZoomLevel = Math.max(lbZoomLevel - 0.25, 0.25); lbApply() }
+    })
+
+    document.getElementById('lightboxImg').addEventListener('wheel', e => {
+        e.preventDefault()
+        lbZoomLevel = e.deltaY < 0
+            ? Math.min(lbZoomLevel + 0.1, 6)
+            : Math.max(lbZoomLevel - 0.1, 0.25)
+        lbApply()
+    })
+
+    // ── Helpers ────────────────────────────────────────────────
+    function showMessage(text, type) {
+        const el = document.getElementById('message')
+        el.textContent = text
+        el.className = type
+        el.style.display = 'block'
+        if (type !== 'info') {
+            setTimeout(() => { el.style.display = 'none' }, 5000)
+        }
+    }
+</script>
+</body>
+</html>

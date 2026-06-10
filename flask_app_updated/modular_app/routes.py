@@ -1035,4 +1035,165 @@ def create_routes(config, ocr_processing_service, llm_service) -> Blueprint:
             print(f"Error downloading batch: {e}")
             return jsonify({'error': str(e)}), 500
     
+    @routes_bp.route('/preprocess_image', methods=['POST'])
+    def preprocess_image():
+        """Preprocess a single uploaded image with chosen method"""
+        try:
+            if 'file' not in request.files:
+                return jsonify({'success': False, 'error': 'No file provided'}), 400
+
+            file = request.files['file']
+            method = request.form.get('method', 'conservative')
+
+            if not file.filename:
+                return jsonify({'success': False, 'error': 'No filename'}), 400
+
+            from .preprocessing import preprocess_single, METHODS
+            from werkzeug.utils import secure_filename
+
+            filename = generate_unique_filename(
+                secure_filename(os.path.basename(file.filename))
+            )
+            upload_path = os.path.join(config.upload_folder, filename)
+            file.save(upload_path)
+
+            preprocessed_dir = os.path.join(
+                os.path.dirname(config.upload_folder),
+                'uploads-preprocessed'
+            )
+
+            out_path = preprocess_single(upload_path, method, preprocessed_dir)
+            out_filename = os.path.basename(out_path)
+
+            return jsonify({
+                'success':  True,
+                'filename': out_filename,
+                'method':   method,
+                'label':    METHODS[method][0]
+            })
+
+        except Exception as e:
+            print(f"Preprocess error: {e}")
+            return jsonify({'success': False, 'error': str(e)}), 500
+
+
+    @routes_bp.route('/preprocess_directory', methods=['POST'])
+    def preprocess_directory():
+        """Preprocess all images in uploads folder with chosen method"""
+        try:
+            data   = request.json or {}
+            method = data.get('method', 'conservative')
+
+            from .preprocessing import preprocess_single, METHODS
+
+            preprocessed_dir = os.path.join(
+                os.path.dirname(config.upload_folder),
+                'uploads-preprocessed'
+            )
+            os.makedirs(preprocessed_dir, exist_ok=True)
+
+            image_exts = {'.jpg', '.jpeg', '.png', '.tiff', '.tif', '.bmp'}
+            images = [
+                f for f in os.listdir(config.upload_folder)
+                if os.path.splitext(f)[1].lower() in image_exts
+            ]
+
+            if not images:
+                return jsonify({'success': False, 'error': 'No images in uploads folder'})
+
+            processed = []
+            failed    = []
+
+            for img_filename in sorted(images):
+                img_path = os.path.join(config.upload_folder, img_filename)
+                try:
+                    out_path = preprocess_single(img_path, method, preprocessed_dir)
+                    processed.append({
+                        'original':     img_filename,
+                        'preprocessed': os.path.basename(out_path)
+                    })
+                except Exception as e:
+                    failed.append({'filename': img_filename, 'error': str(e)})
+
+            return jsonify({
+                'success':         True,
+                'method':          method,
+                'label':           METHODS[method][0],
+                'processed_count': len(processed),
+                'failed_count':    len(failed),
+                'processed':       processed,
+                'failed':          failed
+            })
+
+        except Exception as e:
+            print(f"Preprocess directory error: {e}")
+            return jsonify({'success': False, 'error': str(e)}), 500
+
+
+    @routes_bp.route('/preprocess_test', methods=['POST'])
+    def preprocess_test():
+        """Run all preprocessing methods on one image for comparison"""
+        try:
+            if 'file' not in request.files:
+                return jsonify({'success': False, 'error': 'No file provided'}), 400
+
+            file = request.files['file']
+            if not file.filename:
+                return jsonify({'success': False, 'error': 'No filename'}), 400
+
+            from .preprocessing import run_all_methods
+            from werkzeug.utils import secure_filename
+
+            filename = generate_unique_filename(
+                secure_filename(os.path.basename(file.filename))
+            )
+            upload_path = os.path.join(config.upload_folder, filename)
+            file.save(upload_path)
+
+            test_dir = os.path.join(
+                os.path.dirname(config.upload_folder),
+                'uploads-preprocessed',
+                'test'
+            )
+
+            results = run_all_methods(upload_path, test_dir)
+
+            return jsonify({
+                'success':          True,
+                'original_filename': filename,
+                'results':          results
+            })
+
+        except Exception as e:
+            print(f"Preprocess test error: {e}")
+            return jsonify({'success': False, 'error': str(e)}), 500
+
+
+    @routes_bp.route('/preprocessed_image/<path:filename>')
+    def preprocessed_image(filename):
+        """Serve images from uploads-preprocessed folder"""
+        try:
+            preprocessed_dir = os.path.join(
+                os.path.dirname(config.upload_folder),
+                'uploads-preprocessed'
+            )
+            response = send_from_directory(preprocessed_dir, filename)
+            response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate'
+            return response
+        except Exception as e:
+            return jsonify({'error': str(e)}), 404
+
+
+    @routes_bp.route('/processtest')
+    def processtest():
+        """Serve the preprocessing test page"""
+        try:
+            base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            path = os.path.join(base_dir, 'processtest.html')
+            if os.path.exists(path):
+                return send_file(path)
+            return 'processtest.html not found', 404
+        except Exception as e:
+            return str(e), 500
+
     return routes_bp

@@ -95,11 +95,12 @@
             font-weight: bold;
         }
 
-        thead th:nth-child(1) { width: 50px; }
-        thead th:nth-child(2) { width: 22%; }
-        thead th:nth-child(3) { width: 22%; }
-        thead th:nth-child(4) { width: 28%; }
-        thead th:nth-child(5) { width: 80px; }
+        thead th:nth-child(1) { width: 40px; }
+        thead th:nth-child(2) { width: 280px; }
+        thead th:nth-child(3) { width: 18%; }
+        thead th:nth-child(4) { width: 18%; }
+        thead th:nth-child(5) { width: 22%; }
+        thead th:nth-child(6) { width: 60px; }
 
         tbody tr {
             border-bottom: 1px solid #eee;
@@ -217,9 +218,133 @@
         }
 
         .tab-content.active { display: block; }
+
+                /* Line image zoom lightbox */
+        .line-img {
+            width: 100%;
+            height: 80px;
+            object-fit: contain;
+            object-position: left center;
+            border-radius: 3px;
+            border: 1px solid #ddd;
+            background: #fff;
+            cursor: zoom-in;
+            transition: opacity 0.2s;
+            display: block;
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+        }
+
+        .line-img:hover {
+            opacity: 0.85;
+        }
+
+        #lightbox {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 9999;
+            cursor: zoom-out;
+            overflow: auto;
+        }
+
+        #lightbox.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #lightboxInner {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            min-width: 300px;
+        }
+
+        #lightboxImg {
+            max-width: 90vw;
+            border-radius: 6px;
+            border: 2px solid #555;
+            background: white;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            transition: transform 0.1s;
+            transform-origin: center center;
+        }
+
+        #lightboxControls {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            align-items: center;
+        }
+
+        #lightboxControls button {
+            background: rgba(255,255,255,0.15);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        #lightboxControls button:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        #lightboxZoomLevel {
+            color: white;
+            font-size: 13px;
+            min-width: 50px;
+            text-align: center;
+        }
+
+        #lightboxCaption {
+            color: #ccc;
+            font-size: 12px;
+            margin-top: 10px;
+            font-family: monospace;
+        }
+
+        #lightboxClose {
+            position: fixed;
+            top: 15px;
+            right: 20px;
+            color: white;
+            font-size: 28px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            line-height: 1;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+
+        #lightboxClose:hover {
+            background: rgba(255,255,255,0.2);
+        }
     </style>
 </head>
 <body>
+
+<div id="lightbox" onclick="closeLightboxOnBackdrop(event)">
+    <button id="lightboxClose" onclick="closeLightbox()">✕</button>
+    <div id="lightboxInner">
+        <img id="lightboxImg" src="" alt="Line image">
+        <div id="lightboxControls">
+            <button onclick="zoomOut(event)">−</button>
+            <span id="lightboxZoomLevel">100%</span>
+            <button onclick="zoomIn(event)">+</button>
+            <button onclick="resetZoom(event)">Reset</button>
+        </div>
+        <div id="lightboxCaption"></div>
+    </div>
+</div>
 
 <header>
     <h1>OCR Editor</h1>
@@ -291,12 +416,12 @@
     <table>
         <thead>
             <tr>
-                <th style="width:50px;">#</th>
-                <th style="width:180px;">Page Image</th>
-                <th>Raw TrOCR Output</th>
-                <th>LLM Corrected</th>
-                <th>Manual Edit (editable)</th>
-                <th style="width:80px;">Status</th>
+                <th style="width:40px;">#</th>
+                <th style="width:280px;">Page Image</th>
+                <th style="width:18%;">Raw TrOCR Output</th>
+                <th style="width:18%;">LLM Corrected</th>
+                <th style="width:22%;">Manual Edit (editable)</th>
+                <th style="width:60px;">Status</th>
             </tr>
         </thead>
         <tbody id="lineRows"></tbody>
@@ -521,13 +646,13 @@
 
             tr.innerHTML = `
                 <td class="line-num">${line.line_index + 1}</td>
-                <td style="width:180px; padding:4px; vertical-align:middle; text-align:center;">
+                <td style="width:280px; padding:4px 2px; vertical-align:middle; text-align:left;">
                     ${imgFile
                         ? `<img src="/line_segment/${encodeURIComponent(imgFile)}${cacheBust}"
                                 alt="Line ${line.line_index + 1}"
-                                style="max-width:170px; max-height:60px;
-                                    object-fit:contain; border-radius:3px;
-                                    border:1px solid #ddd; background:#fff;"
+                                class="line-img"
+                                title="Click to zoom"
+                                onclick="openLightbox(this.src, 'Line ${line.line_index + 1} — ${imgFile}')"
                                 onerror="this.style.display='none';
                                         this.nextElementSibling.style.display='block';">
                         <span style="display:none; font-size:11px; color:#aaa;">No image</span>`
@@ -699,6 +824,88 @@
         el.style.display = 'block'
         setTimeout(() => { el.style.display = 'none' }, 4000)
     }
+
+        // ── Lightbox ───────────────────────────────────────────────
+    let lightboxZoom = 1
+
+    function openLightbox(imgSrc, caption) {
+        const lb  = document.getElementById('lightbox')
+        const img = document.getElementById('lightboxImg')
+        const cap = document.getElementById('lightboxCaption')
+
+        lightboxZoom = 1
+        img.src = imgSrc
+        img.style.transform = 'scale(1)'
+        cap.textContent = caption || ''
+        document.getElementById('lightboxZoomLevel').textContent = '100%'
+
+        lb.classList.add('active')
+        document.body.style.overflow = 'hidden'
+    }
+
+    function closeLightbox() {
+        document.getElementById('lightbox').classList.remove('active')
+        document.body.style.overflow = ''
+    }
+
+    function closeLightboxOnBackdrop(e) {
+        if (e.target === document.getElementById('lightbox')) {
+            closeLightbox()
+        }
+    }
+
+    function zoomIn(e) {
+        e.stopPropagation()
+        lightboxZoom = Math.min(lightboxZoom + 0.25, 5)
+        applyZoom()
+    }
+
+    function zoomOut(e) {
+        e.stopPropagation()
+        lightboxZoom = Math.max(lightboxZoom - 0.25, 0.25)
+        applyZoom()
+    }
+
+    function resetZoom(e) {
+        e.stopPropagation()
+        lightboxZoom = 1
+        applyZoom()
+    }
+
+    function applyZoom() {
+        document.getElementById('lightboxImg').style.transform =
+            `scale(${lightboxZoom})`
+        document.getElementById('lightboxZoomLevel').textContent =
+            Math.round(lightboxZoom * 100) + '%'
+    }
+
+    // Close lightbox with Escape key
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') closeLightbox()
+        if (e.key === '+' || e.key === '=') {
+            if (document.getElementById('lightbox').classList.contains('active')) {
+                lightboxZoom = Math.min(lightboxZoom + 0.25, 5)
+                applyZoom()
+            }
+        }
+        if (e.key === '-') {
+            if (document.getElementById('lightbox').classList.contains('active')) {
+                lightboxZoom = Math.max(lightboxZoom - 0.25, 0.25)
+                applyZoom()
+            }
+        }
+    })
+
+    // Mouse wheel zoom inside lightbox
+    document.getElementById('lightboxImg').addEventListener('wheel', e => {
+        e.preventDefault()
+        if (e.deltaY < 0) {
+            lightboxZoom = Math.min(lightboxZoom + 0.1, 5)
+        } else {
+            lightboxZoom = Math.max(lightboxZoom - 0.1, 0.25)
+        }
+        applyZoom()
+    })
 
     function escHtml(str) {
         if (!str) return ''

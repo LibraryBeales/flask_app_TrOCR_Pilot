@@ -3,10 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TrOCR Image Annotation & Correction Tool</title>
-    <!-- Fabric.js library from CDN -->
+    <title>4BEN Transformer Based OCR Pipeline</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
-    ...
     <style>
         :root {
             --bg-main: #f7f8fa;
@@ -18,22 +16,18 @@
             --bg-highlight: #e3e0f7;
             --bg-white: #fff;
             --bg-offwhite: #f9f9fb;
-
             --purple-deep: #6c3fc5;
             --purple-main: #8f5ee3;
             --purple-pastel: #bba6e8;
             --purple-light: #e3d8fa;
             --purple-dark: #4b2769;
-
             --blue-main: #5bb6f9;
             --blue-light: #e6f2fd;
             --blue-accent: #b3e0ff;
             --blue-dark: #2a4d69;
-
             --gray-dark: #23272f;
             --gray-main: #444857;
             --gray-light: #bfc4d1;
-
             --success: #a3e635;
             --warning: #ffe066;
             --danger: #ff6b6b;
@@ -68,78 +62,177 @@
             text-shadow: 0 2px 8px var(--purple-light);
         }
 
-        .main-content {
-            display: grid;
-            grid-template-columns: 3fr 2fr;
-            align-items: start;
-            margin-bottom: 30px;
-            gap: 30px;
+        .status-bar {
+            width: 100%;
+            background: var(--bg-panel);
+            border-radius: 12px;
+            border: 2px solid var(--purple-pastel);
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 12px 0 var(--bg-highlight);
+            box-sizing: border-box;
         }
 
-        .image-panel, .inference-panel {
+        .status-bar h3 {
+            margin-top: 0;
+            color: var(--purple-deep);
+            border-bottom: 2px solid var(--purple-main);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .status-bar-inner {
+            display: grid;
+            grid-template-columns: 200px 180px 1fr 1fr auto;
+            gap: 20px;
+            align-items: start;
+        }
+
+        @media (max-width: 1100px) {
+            .status-bar-inner {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .status-card {
+            background: var(--bg-white);
+            border-radius: 8px;
+            padding: 12px 15px;
+            border: 1px solid var(--purple-light);
+        }
+
+        .status-card-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 6px;
+        }
+
+        .status-card-value {
+            font-size: 13px;
+            color: var(--purple-main);
+            word-break: break-all;
+            font-family: monospace;
+        }
+
+        .line-count-value {
+            font-size: 42px;
+            font-weight: bold;
+            color: var(--purple-deep);
+            text-align: center;
+            line-height: 1;
+        }
+
+        .pipeline-lights {
+            background: var(--bg-white);
+            border-radius: 8px;
+            padding: 12px 15px;
+            border: 1px solid var(--purple-light);
+        }
+
+        .pipeline-lights .status-card-label {
+            margin-bottom: 10px;
+        }
+
+        .light-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .light-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .status-light {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #ccc;
+            flex-shrink: 0;
+            box-shadow: 0 0 5px rgba(0,0,0,0.2);
+        }
+
+        .light-text {
+            flex: 1;
+        }
+
+        .light-title {
+            font-weight: bold;
+            font-size: 13px;
+            line-height: 1.2;
+        }
+
+        .light-label {
+            font-size: 11px;
+            color: #888;
+        }
+
+        .sample-line-card {
+            background: var(--bg-white);
+            border-radius: 8px;
+            padding: 12px 15px;
+            border: 1px solid var(--purple-light);
+        }
+
+        .sample-line-card .status-card-label {
+            margin-bottom: 8px;
+        }
+
+        .sample-line-image {
+            width: 100%;
+            max-height: 50px;
+            object-fit: contain;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            background: #fff;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .sample-text-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 4px;
+            font-size: 11px;
+        }
+
+        .sample-text-label {
+            font-weight: bold;
+            color: #888;
+            flex-shrink: 0;
+            width: 35px;
+        }
+
+        .sample-text-value {
+            font-family: 'Courier New', monospace;
+            color: var(--gray-dark);
+            word-break: break-word;
+            line-height: 1.4;
+        }
+
+        .sample-text-value.llm {
+            color: #1e8449;
+        }
+
+        .status-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .image-panel {
             width: 100%;
             background: var(--bg-panel);
             padding: 20px;
             border-radius: 12px;
             border: 2px solid var(--purple-pastel);
-            position: relative;
             box-shadow: 0 2px 12px 0 var(--bg-highlight);
+            box-sizing: border-box;
         }
 
-        .inference-panel {
-            position: sticky;
-            top: 20px;
-            max-height: calc(100vh - 140px);
-            overflow: auto;
-        }
-
-        .inference-panel::before {
-            content: "↓ Scroll down for OCR Results";
-            position: absolute;
-            top: -40px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--purple-main);
-            color: var(--bg-white);
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-size: 14px;
-            white-space: nowrap;
-            opacity: 0.92;
-            pointer-events: none;
-            animation: bounce 2s infinite;
-            z-index: 10;
-            box-shadow: 0 2px 8px var(--purple-light);
-        }
-
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
-            40% { transform: translateX(-50%) translateY(-5px); }
-            60% { transform: translateX(-50%) translateY(-3px); }
-        }
-
-        .scroll-indicator {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: linear-gradient(90deg, var(--purple-main), var(--blue-main));
-            color: var(--bg-white);
-            padding: 10px 18px;
-            border-radius: 25px;
-            font-size: 15px;
-            cursor: pointer;
-            box-shadow: 0 4px 16px rgba(140, 90, 230, 0.18);
-            z-index: 1000;
-            display: none;
-            font-weight: 500;
-            letter-spacing: 0.5px;
-        }
-        .scroll-indicator:hover {
-            background: linear-gradient(90deg, var(--purple-deep), var(--blue-dark));
-            transform: translateY(-2px) scale(1.04);
-        }
-
-        .image-panel h3, .inference-panel h3 {
+        .image-panel h3 {
             margin-top: 0;
             color: var(--purple-deep);
             border-bottom: 2px solid var(--purple-main);
@@ -178,55 +271,6 @@
             text-align: center;
         }
 
-        .inference-container {
-            background: var(--bg-white);
-            border: 2px solid var(--purple-pastel);
-            border-radius: 10px;
-            padding: 15px;
-            height: 500px;
-            overflow-y: auto;
-        }
-
-        .text-section label {
-            color: var(--purple-main);
-        }
-
-        .text-section textarea,
-        .line-segment-text {
-            background: var(--bg-offwhite);
-            border: 1.5px solid var(--purple-light);
-            border-radius: 6px;
-            font-family: 'Courier New', monospace;
-            font-size: 16px;
-            color: var(--gray-dark);
-            padding: 12px;
-            resize: vertical;
-        }
-
-        .original-text,
-        #originalTextDisplay {
-            background: var(--warning);
-            border-color: #ffeaa7;
-            color: #856404;
-        }
-
-        .corrected-text,
-        #correctedText {
-            background: var(--success);
-            border: 2px solid #c3e6cb;
-            border-radius: 8px;
-            font-family: 'Courier New', monospace;
-            font-size: 28px;
-            color: #155724;
-            padding: 28px 24px;
-            min-height: 180px;
-            outline: none;
-            white-space: pre-wrap;
-            box-shadow: 0 2px 10px rgba(163,230,53,0.08);
-            margin-bottom: 0;
-            resize: none;
-        }
-
         .controls {
             margin-top: 20px;
             display: flex;
@@ -254,11 +298,13 @@
             font-weight: 500;
             box-shadow: 0 2px 8px var(--bg-highlight);
         }
+
         button:hover {
             background: linear-gradient(90deg, var(--purple-deep), var(--blue-dark));
             transform: translateY(-2px) scale(1.03);
             box-shadow: 0 5px 18px var(--purple-light);
         }
+
         button:disabled {
             background: #bfc4d1;
             color: #fff;
@@ -271,18 +317,22 @@
             background: linear-gradient(90deg, #7ed957, #b3e635);
             color: #23272f;
         }
+
         .btn-success:hover {
             background: linear-gradient(90deg, #a3e635, #7ed957);
             color: #23272f;
         }
+
         .btn-danger {
             background: linear-gradient(90deg, #ff6b6b, #ffb3b3);
             color: #23272f;
         }
+
         .btn-danger:hover {
             background: linear-gradient(90deg, #ffb3b3, #ff6b6b);
             color: #23272f;
         }
+
         .btn-warning {
             background: linear-gradient(90deg, #ffe066, #fff3cd);
             color: #23272f;
@@ -298,6 +348,7 @@
             color: var(--bg-white);
             border: none;
         }
+
         .spanish-chars button:hover {
             background: linear-gradient(90deg, var(--purple-deep), var(--blue-dark));
         }
@@ -309,11 +360,13 @@
             display: none;
             font-weight: 500;
         }
+
         .status.success {
             background-color: #e6f9e6;
             color: #155724;
             border: 2px solid #b3e635;
         }
+
         .status.error {
             background-color: #fbeaea;
             color: #721c24;
@@ -338,6 +391,7 @@
             border: 1px solid var(--blue-main);
             font-size: 14px;
         }
+
         .split-indicator {
             background: var(--purple-main);
             color: var(--bg-white);
@@ -371,19 +425,11 @@
             font-weight: 500;
             transition: all 0.3s ease;
         }
+
         .file-label:hover {
             background: linear-gradient(90deg, var(--purple-deep), var(--blue-dark));
             transform: translateY(-2px);
             box-shadow: 0 5px 15px var(--purple-light);
-        }
-
-        .inference-stats {
-            background: var(--bg-accent);
-            padding: 10px;
-            border-radius: 4px;
-            margin-bottom: 15px;
-            font-size: 0.95em;
-            color: var(--purple-main);
         }
 
         .debug-section {
@@ -394,1496 +440,1033 @@
             border: 1px solid var(--purple-light);
         }
 
-        .line-segments-panel {
-            background: var(--bg-panel-alt);
+        .preprocess-section {
+            background: #f0faf0;
             padding: 20px;
             border-radius: 10px;
-            border: 2px solid var(--blue-accent);
-            margin-top: 20px;
+            margin-bottom: 20px;
+            border: 2px dashed #27ae60;
         }
-        .line-segments-panel h3 {
-            margin-top: 0;
-            color: var(--blue-dark);
-            border-bottom: 2px solid var(--blue-main);
-            padding-bottom: 10px;
-        }
-        .line-segments-container {
-            max-height: 600px;
-            overflow-y: auto;
-            border: 1px solid var(--blue-accent);
-            border-radius: 6px;
-            background: var(--bg-white);
-            padding: 15px;
-        }
-        .line-segment-item {
-            display: flex;
-            gap: 15px;
-            padding: 15px;
-            border: 1px solid var(--purple-light);
-            border-radius: 6px;
-            margin-bottom: 10px;
-            background: var(--bg-section);
-            align-items: flex-start;
-        }
-        .line-segment-item:last-child {
-            margin-bottom: 0;
-        }
-        .line-segment-image {
-            flex-shrink: 0;
-            width: 320px;
-            height: 130px;
-            border: 1px solid var(--blue-accent);
-            border-radius: 4px;
-            background: var(--bg-white);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            color: var(--gray-main);
-            overflow: hidden;
-        }
-        .line-segment-image img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-        }
-        .line-segment-content {
-            flex: 1;
-            min-width: 0;
-        }
-        .line-segment-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-            padding: 5px 0;
-            border-bottom: 1px solid var(--blue-accent);
-        }
-        .line-segment-index {
-            font-weight: bold;
-            color: var(--purple-main);
+
+        .preprocess-section h4 {
+            margin: 0 0 12px 0;
+            color: #1e8449;
             font-size: 16px;
-            background: var(--bg-accent);
-            padding: 3px 8px;
-            border-radius: 4px;
-        }
-        .line-segment-confidence {
-            font-size: 12px;
-            color: var(--blue-dark);
-            background: var(--bg-panel-alt);
-            padding: 3px 8px;
-            border-radius: 4px;
-        }
-        .line-segment-text {
-            width: 100%;
-            min-height: 80px;
-            padding: 15px;
-            border: 2px solid var(--purple-light);
-            border-radius: 4px;
-            font-family: 'Courier New', monospace;
-            font-size: 18px;
-            resize: vertical;
-            background: var(--bg-white);
-            margin-bottom: 8px;
-        }
-        .line-segment-text:focus {
-            border-color: var(--purple-main);
-            outline: none;
-            box-shadow: 0 0 0 2px var(--purple-light);
-        }
-        .line-segment-actions {
-            display: flex;
-            gap: 8px;
-        }
-        .line-segment-actions button {
-            padding: 6px 12px;
-            font-size: 12px;
-            min-width: auto;
         }
 
-        .tab-container {
-            margin-bottom: 20px;
-        }
-        .tab-buttons {
-            display: flex;
-            gap: 5px;
-            margin-bottom: 15px;
-        }
-        .tab-button {
-            padding: 8px 16px;
-            background: var(--bg-accent);
-            border: 1px solid var(--purple-light);
-            border-radius: 4px 4px 0 0;
-            cursor: pointer;
-            font-size: 14px;
-            color: var(--purple-main);
-        }
-        .tab-button.active {
-            background: var(--purple-main);
-            color: var(--bg-white);
-            border-color: var(--purple-main);
-        }
-        .tab-content {
-            display: none;
-        }
-        .tab-content.active {
-            display: block;
-        }
-
-        .ocr-results-section {
-            margin-top: 30px;
-            background: var(--bg-section);
-            padding: 25px;
-            border-radius: 12px;
-            border: 2px solid var(--purple-pastel);
-        }
-        .ocr-results-section h2 {
-            color: var(--purple-main);
-            margin-top: 0;
-            margin-bottom: 20px;
-            text-align: center;
-            font-size: 1.8em;
-            border-bottom: 3px solid var(--purple-main);
-            padding-bottom: 10px;
-        }
-        .full-text-section {
-            background: var(--bg-white);
-            padding: 20px;
-            border-radius: 8px;
-            border: 2px solid var(--blue-accent);
-            margin-bottom: 30px;
-            box-shadow: 0 2px 10px var(--bg-highlight);
-        }
-        .full-text-section h3 {
-            color: var(--purple-main);
-            margin-top: 0;
-            margin-bottom: 15px;
-            border-bottom: 2px solid var(--success);
-            padding-bottom: 8px;
-        }
-        .text-zoom-controls {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-        .text-zoom-controls button {
-            padding: 6px 10px;
-            font-size: 14px;
-        }
-        .full-text-content {
-            background: var(--bg-panel-alt);
-            padding: 20px;
+        .method-select {
+            padding: 8px 12px;
             border-radius: 6px;
-            border: 1px solid var(--blue-accent);
-            font-family: 'Courier New', monospace;
-            font-size: 20px;
-            line-height: 1.6;
-            white-space: pre-wrap;
-            max-height: 400px;
-            overflow-y: auto;
-            margin-bottom: 15px;
-        }
-        #originalTextDisplay {
-            background: var(--warning);
-            padding: 28px 24px;
-            border-radius: 8px;
-            border: 2px solid #ffeaa7;
-            font-family: 'Courier New', monospace;
-            font-size: 28px;
-            line-height: 1.7;
-            white-space: pre-wrap;
-            min-height: 180px;
-            color: #856404;
-            box-shadow: 0 2px 10px rgba(255,193,7,0.08);
-            margin-bottom: 0;
+            border: 1px solid #27ae60;
+            font-size: 14px;
+            background: white;
+            margin-right: 8px;
         }
 
-        @media (max-width: 1200px) {
-            .main-content {
-                display: flex;
-                flex-direction: column;
-                gap: 20px;
-            }
+        .preprocess-progress {
+            display: none;
+            margin-top: 10px;
+            padding: 10px;
+            background: #d5f5e3;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #1e8449;
         }
+
     </style>
-
-
 </head>
 <body>
-    <div class="container">
-        <h1>TrOCR Image Annotation & Correction Tool</h1>
-        
-        <div class="upload-section">
-            <div style="display:flex; gap:20px; flex-wrap:wrap; align-items:flex-start;">
+<div class="container">
 
-                <div>
-                    <label for="fileInput" class="file-label">
-                        📁 Upload Single Image or PDF
-                    </label>
-                    <input type="file" id="fileInput" name="file"
-                        class="file-input" accept="image/*,.pdf" />
-                </div>
+    <h1>4BEN Transformer Based OCR Pipeline </h1>
 
-                <div>
-                    <label for="directoryInput" class="file-label"
-                        style="background: linear-gradient(90deg, #6c3fc5, #2980b9);">
-                        📂 Upload Whole Directory
-                    </label>
-                    <input type="file" id="directoryInput" name="files"
-                        class="file-input" multiple webkitdirectory />
-                </div>
-
+    <!-- Upload Section -->
+    <div class="upload-section">
+        <div style="display:flex; gap:20px; flex-wrap:wrap; align-items:flex-start;">
+            <div>
+                <label for="fileInput" class="file-label">
+                    📁 Upload Single Image or PDF
+                </label>
+                <input type="file" id="fileInput" name="file"
+                       style="display:none" accept="image/*,.pdf"/>
             </div>
-
-            <p style="margin: 10px 0 0 0; color: #666;">
-                Supported formats: JPG, PNG, PDF, TIFF, BMP (Max 16MB per file)
-            </p>
-
-            <div class="loading-indicator" id="loadingIndicator">
-                🔄 Processing image... Please wait
-            </div>
-
-            <div id="batchProgress" style="display:none; margin-top:15px;
-                background:#e8f4fd; padding:15px; border-radius:8px;
-                border:2px solid #2980b9;">
-                <div style="font-weight:bold; color:#2c3e50; margin-bottom:8px;">
-                    Processing Directory Batch
-                </div>
-                <div style="background:#ddd; border-radius:4px; height:20px;
-                            overflow:hidden; margin-bottom:8px;">
-                    <div id="batchProgressBar"
-                        style="background: linear-gradient(90deg,#6c3fc5,#2980b9);
-                                height:100%; width:0%; transition:width 0.3s;
-                                border-radius:4px;"></div>
-                </div>
-                <div id="batchProgressText" style="font-size:13px; color:#555;">
-                    Preparing...
-                </div>
-                <div id="batchFailedList" style="margin-top:8px; font-size:12px;
-                    color:#c0392b; display:none;"></div>
-            </div>
-
-            <div id="batchComplete" style="display:none; margin-top:15px;
-                background:#e8f9e8; padding:15px; border-radius:8px;
-                border:2px solid #27ae60;">
-                <div style="font-weight:bold; color:#1e8449; margin-bottom:8px;">
-                    Batch Processing Complete
-                </div>
-                <div id="batchCompleteText" style="font-size:13px;
-                    color:#555; margin-bottom:10px;"></div>
-                <button onclick="openBatchInEditor()"
-                        style="background:linear-gradient(90deg,#27ae60,#2ecc71);
-                            color:white; border:none; padding:10px 20px;
-                            border-radius:6px; cursor:pointer; font-weight:bold;
-                            font-size:14px; margin-right:10px;">
-                    ✏️ Review All Pages in Editor
-                </button>
-                <button onclick="downloadBatch()"
-                        style="background:linear-gradient(90deg,#e67e22,#f39c12);
-                            color:white; border:none; padding:10px 20px;
-                            border-radius:6px; cursor:pointer; font-weight:bold;
-                            font-size:14px;">
-                    ⬇️ Download Combined TXT
-                </button>
-            </div>
-
-        </div>
-        
-        <div class="debug-section">
-            <h4>Debug Upload Test:</h4>
-            <form id="debugForm" enctype="multipart/form-data">
-                <input type="file" name="file" accept="image/*" id="debugFileInput">
-                <button type="button" onclick="debugUpload()">Upload Test</button>
-            </form>
-        </div>
-        
-        <div class="toolbar">
-            <button id="drawModeBtn">Draw Mode</button>
-            <button id="selectModeBtn">Select Mode</button>
-            <button id="deleteBoxBtn" disabled>🗑️ Delete Selected Box</button>
-            <button id="rerunInferenceBtn" class="btn-warning">🔄 Re-run OCR</button>
-            <button id="openEditorBtn" onclick="openInEditor()" disabled>Edit in Editor</button>
-            <button id="downloadTxtBtn" onclick="downloadCurrentText()" disabled>⬇️ Download TXT</button>
-            <div class="image-split-controls">
-                <label for="splitImageToggle" style="margin-right: 10px; font-weight: bold;">Split Image:</label>
-                <input type="checkbox" id="splitImageToggle" style="transform: scale(1.5); margin-right: 10px;">
-                <span>Process left half first, then right half</span>
-                <div class="split-indicator" id="splitIndicator">SPLIT MODE</div>
-            </div>
-            <div class="current-image" id="currentImageName">No image loaded</div>
-            <div id="pdfControls" style="display:none; gap:8px; align-items:center;">
-                <button id="prevPageBtn">⬅️ Prev Page</button>
-                <span id="pageIndicator">Page 1 / 1</span>
-                <button id="nextPageBtn">Next Page ➡️</button>
+            <div>
+                <label for="directoryInput" class="file-label"
+                       style="background:linear-gradient(90deg,#6c3fc5,#2980b9);">
+                    📂 Upload Whole Directory
+                </label>
+                <input type="file" id="directoryInput" name="files"
+                       style="display:none" multiple webkitdirectory/>
             </div>
         </div>
-        
-        <div class="main-content">
-            <div class="image-panel">
-                <h3>📷 Image & Annotations</h3>
-                <div class="canvas-container">
-                    <canvas id="annotationCanvas" width="600" height="400"></canvas>
-                </div>
-                
-                <div style="margin-top: 15px;">
-                    <div>
-                        <label for="errorType">Error Type:</label>
-                        <select id="errorType">
-                            <option value="spelling">Spelling</option>
-                            <option value="grammar">Grammar</option>
-                            <option value="spacing">Spacing</option>
-                            <option value="formatting">Formatting</option>
-                            <option value="other">Other</option>
-                        </select>
-                    </div>
-                    
-                    <div style="margin-top: 10px;">
-                        <label for="textInput">Annotation Text:</label>
-                        <input type="text" id="textInput" placeholder="Enter text for annotation">
-                    </div>
-                    <div style="margin-top: 10px;">
-                        <label>Spanish Characters (click to insert into focused text field):</label>
-                        <div class="spanish-chars">
-                            <button type="button" onclick="insertSpanishChar('ñ')">ñ</button>
-                            <button type="button" onclick="insertSpanishChar('á')">á</button>
-                            <button type="button" onclick="insertSpanishChar('é')">é</button>
-                            <button type="button" onclick="insertSpanishChar('í')">í</button>
-                            <button type="button" onclick="insertSpanishChar('ó')">ó</button>
-                            <button type="button" onclick="insertSpanishChar('ú')">ú</button>
-                            <button type="button" onclick="insertSpanishChar('ü')">ü</button>
-                            <button type="button" onclick="insertSpanishChar('¿')">¿</button>
-                            <button type="button" onclick="insertSpanishChar('¡')">¡</button>
-                        </div>
-                    </div>
-                </div>
+        <p style="margin:10px 0 0 0; color:#666;">
+            Supported formats: JPG, PNG, PDF, TIFF, BMP (Max 16MB per file)
+        </p>
+        <div class="loading-indicator" id="loadingIndicator">
+            🔄 Processing image... Please wait
+        </div>
+
+        <!-- Batch progress -->
+        <div id="batchProgress" style="display:none; margin-top:15px;
+             background:#e8f4fd; padding:15px; border-radius:8px;
+             border:2px solid #2980b9;">
+            <div style="font-weight:bold; color:#2c3e50; margin-bottom:8px;">
+                Processing Directory Batch
             </div>
-            
-            <div class="inference-panel">
-                <div class="tab-container">
-                    <div class="tab-buttons">
-                        <button class="tab-button active" onclick="switchTab('full-text')">Full Text</button>
-                        <button class="tab-button" onclick="switchTab('line-segments')">Line Segments</button>
-                    </div>
-                    
-                    <div id="full-text-tab" class="tab-content active">
-                        <div class="ocr-results-section">
-                            <h2>🤖 Full Text OCR Results</h2>
-                            <div class="full-text-section">
-                                <h3>📄 Original OCR Output</h3>
-                                <div class="full-text-content" id="originalTextContent">
-                                    <div id="originalTextDisplay">No OCR data available</div>
-                                </div>
-                            </div>
-                            <div class="full-text-section">
-                                <h3>✏️ Corrected Text</h3>
-                                <div class="text-zoom-controls">
-                                    <span>Zoom:</span>
-                                    <button type="button" id="decreaseTextZoom">A-</button>
-                                    <button type="button" id="increaseTextZoom">A+</button>
-                                </div>
-                                    <div class="full-text-content" id="correctedTextContent">
-                                        <div id="correctedText" class="corrected-text" contenteditable="true" spellcheck="true" style="min-height: 180px;"></div>
-                                    </div>
-                            </div>
-                            <div class="section-actions">
-                                <button id="saveCorrectionBtn" class="btn-success">💾 Save Correction</button>
-                                <button id="resetCorrectionBtn" class="btn-warning">↩️ Reset to Original</button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div id="line-segments-tab" class="tab-content">
-                        <div class="ocr-results-section">
-                            <h2>📝 Line-by-Line OCR Results</h2>
-                            <div class="line-segments-section">
-                                <h3>🔍 Individual Line Segments</h3>
-                                <div class="inference-stats" id="lineSegmentsStats">
-                                    No line segments available
-                                </div>
-                                <div class="line-segments-container" id="lineSegmentsContainer">
-                                    <div style="padding: 20px; text-align: center; color: #666;">
-                                        Upload an image to see line segments and OCR results
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="section-actions">
-                                <button id="saveAllLinesBtn" class="btn-success">💾 Save All Line Corrections</button>
-                                <button id="resetAllLinesBtn" class="btn-warning">↩️ Reset All Lines</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div style="background:#ddd; border-radius:4px; height:20px;
+                        overflow:hidden; margin-bottom:8px;">
+                <div id="batchProgressBar"
+                     style="background:linear-gradient(90deg,#6c3fc5,#2980b9);
+                            height:100%; width:0%; transition:width 0.3s;
+                            border-radius:4px;"></div>
+            </div>
+            <div id="batchProgressText" style="font-size:13px; color:#555;">
+                Preparing...
+            </div>
+            <div id="batchFailedList"
+                 style="margin-top:8px; font-size:12px; color:#c0392b; display:none;">
             </div>
         </div>
-        
-        <div class="controls">
-            <button id="nextImageBtn">▶️ Next Image</button>
-            <button id="saveAnnotationsBtn" class="btn-success">💾 Save Annotations</button>
-            <button id="clearAllBtn" class="btn-danger">🗑️ Clear All Boxes</button>
-        </div>
-        
-        <div class="status" id="statusMessage"></div>
-        
-        <div class="scroll-indicator" id="scrollIndicator" onclick="scrollToOCRResults()">
-            📄 View OCR Results ↓
+
+        <!-- Batch complete -->
+        <div id="batchComplete" style="display:none; margin-top:15px;
+             background:#e8f9e8; padding:15px; border-radius:8px;
+             border:2px solid #27ae60;">
+            <div style="font-weight:bold; color:#1e8449; margin-bottom:8px;">
+                Batch Processing Complete
+            </div>
+            <div id="batchCompleteText"
+                 style="font-size:13px; color:#555; margin-bottom:10px;"></div>
+            <button onclick="openBatchInEditor()"
+                    style="background:linear-gradient(90deg,#27ae60,#2ecc71);
+                           color:white; border:none; padding:10px 20px;
+                           border-radius:6px; cursor:pointer; font-weight:bold;
+                           font-size:14px; margin-right:10px;">
+                ✏️ Review All Pages in Editor
+            </button>
+            <button onclick="downloadBatch()"
+                    style="background:linear-gradient(90deg,#e67e22,#f39c12);
+                           color:white; border:none; padding:10px 20px;
+                           border-radius:6px; cursor:pointer; font-weight:bold;
+                           font-size:14px;">
+                ⬇️ Download Combined TXT
+            </button>
         </div>
     </div>
 
-    <script>
-        // Initialize Fabric.js canvas
-        const canvas = new fabric.Canvas('annotationCanvas');
-        
-        // Global variables
-        let currentImageName = '';
-        let isDrawing = false;
-        let startX, startY;
-        let currentRect = null;
-        let drawMode = true;
-        let currentInferenceData = null;
-        let currentLineSegments = [];
-        let isImageSplit = false;
-        let splitResults = { left: null, right: null };
-        let isPdf = false;
-        let pdfPages = [];
-        let currentPageIndex = 0;
-        let currentBatchManifestId = null;
-        
-        // Canvas settings
-        canvas.selection = false;
-        // Increase default canvas size for better visibility
-        canvas.setDimensions({ width: 1400, height: 950 });
-        
-        // Initialize the application
-        function init() {
-            setupEventListeners();
-            loadFirstImage();
-            updateModeButtons();
-        }
-        
-        function setupEventListeners() {
-            // File upload
-            document.getElementById('fileInput').addEventListener('change', handleFileUpload);
-            document.getElementById('directoryInput').addEventListener(
-                'change', handleDirectoryUpload
-            )
-            
-            // Mode buttons
-            document.getElementById('drawModeBtn').addEventListener('click', () => setDrawMode(true));
-            document.getElementById('selectModeBtn').addEventListener('click', () => setDrawMode(false));
-            
-            // Control buttons
-            document.getElementById('deleteBoxBtn').addEventListener('click', deleteSelectedBox);
-            document.getElementById('nextImageBtn').addEventListener('click', loadNextImage);
-            document.getElementById('saveAnnotationsBtn').addEventListener('click', saveAnnotations);
-            document.getElementById('clearAllBtn').addEventListener('click', clearAllBoxes);
-            document.getElementById('rerunInferenceBtn').addEventListener('click', rerunInference);
-            
-            // Inference controls
-            document.getElementById('saveCorrectionBtn').addEventListener('click', saveCorrection);
-            document.getElementById('resetCorrectionBtn').addEventListener('click', resetCorrection);
-            
-            // Line segment controls
-            document.getElementById('saveAllLinesBtn').addEventListener('click', saveAllLineCorrections);
-            document.getElementById('resetAllLinesBtn').addEventListener('click', resetAllLineCorrections);
-            
-            // Image split toggle
-            document.getElementById('splitImageToggle').addEventListener('change', function() {
-                isImageSplit = this.checked;
-                const indicator = document.getElementById('splitIndicator');
-                if (isImageSplit) {
-                    indicator.style.display = 'inline-block';
-                } else {
-                    indicator.style.display = 'none';
-                }
-                console.log('Image split mode:', isImageSplit);
-            });
-            
-            // Canvas events
-            canvas.on('mouse:down', onMouseDown);
-            canvas.on('mouse:move', onMouseMove);
-            canvas.on('mouse:up', onMouseUp);
-            canvas.on('selection:created', onSelectionCreated);
-            canvas.on('selection:updated', onSelectionUpdated);
-            canvas.on('selection:cleared', onSelectionCleared);
-            
-            // Form events
-            document.getElementById('errorType').addEventListener('change', updateSelectedBoxErrorType);
-            document.getElementById('textInput').addEventListener('input', updateSelectedBoxText);
-        }
-        
-        function switchTab(tabName) {
-            // Update tab buttons
-            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            // Update tab content
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-            document.getElementById(tabName + '-tab').classList.add('active');
-        }
-        
-        async function handleFileUpload(event) {
-            console.log("🔔 handleFileUpload fired", event);
-            const file = event.target.files[0];
-            console.log("  selected file:", file);
-            if (!file) return;
-            // If it's an image (not PDF) and split not selected, offer to split when very wide
-            if (!isImageSplit && file.type && file.type.startsWith('image/')) {
-                try {
-                    const dims = await getImageDimensions(file);
-                    if (dims && dims.width / Math.max(1, dims.height) >= 1.25) {
-                        const wantSplit = confirm('This image looks like a two-page scan. Split into left and right pages?');
-                        isImageSplit = wantSplit;
-                        document.getElementById('splitImageToggle').checked = wantSplit;
-                        document.getElementById('splitIndicator').style.display = wantSplit ? 'inline-block' : 'none';
-                    }
-                } catch (e) {
-                    console.log('Dimension check failed, continuing without prompt', e);
-                }
-            }
+        <!-- Preprocess Section -->
+    <div class="preprocess-section">
+        <div style="display:flex; justify-content:space-between;
+                    align-items:flex-start; flex-wrap:wrap; gap:10px;">
+            <h4>🔧 Image Preprocessing</h4>
+            <a href="/processtest" target="_blank"
+               style="background:#8e44ad; color:white; padding:7px 14px;
+                      border-radius:6px; font-size:13px; font-weight:bold;
+                      text-decoration:none; white-space:nowrap;">
+                🧪 Test Preprocessing
+            </a>
+        </div>
 
-            const formData = new FormData();
-            formData.append('file', file);
-            formData.append('split_image', isImageSplit);
-            
-            // Show loading indicator
-            const loadingIndicator = document.getElementById('loadingIndicator');
-            loadingIndicator.style.display = 'block';
-            
-            const statusMessage = isImageSplit ? 'Uploading and processing image in split mode...' : 'Uploading and processing file...';
-            showStatus(statusMessage, 'success');
-            
-            fetch('/upload', {
-                method: 'POST',
-                body: formData
+        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+                    margin-bottom:10px;">
+            <select id="preprocessMethod" class="method-select">
+                <option value="conservative">Conservative Enhancement</option>
+                <option value="sauvola">Sauvola Binarisation</option>
+                <option value="adaptive">Adaptive Threshold</option>
+                <option value="nobleed">Bleed-Through Removal</option>
+            </select>
+
+            <div>
+                <label for="preprocessFileInput"
+                       style="display:inline-block; padding:8px 16px;
+                              background:linear-gradient(90deg,#27ae60,#2ecc71);
+                              color:white; border-radius:6px; cursor:pointer;
+                              font-size:13px; font-weight:bold;">
+                    📄 Preprocess Single Image
+                </label>
+                <input type="file" id="preprocessFileInput"
+                       accept="image/*" style="display:none;">
+            </div>
+
+            <button onclick="preprocessDirectory()"
+                    style="background:linear-gradient(90deg,#1e8449,#27ae60);
+                           color:white; padding:8px 16px; border:none;
+                           border-radius:6px; cursor:pointer; font-size:13px;
+                           font-weight:bold;">
+                📂 Preprocess All Uploads
+            </button>
+        </div>
+
+        <div id="preprocessProgress" class="preprocess-progress"></div>
+    </div>
+
+    <!-- Debug section -->
+    <div class="debug-section">
+        <h4>Debug Upload Test:</h4>
+        <form id="debugForm" enctype="multipart/form-data">
+            <input type="file" name="file" accept="image/*" id="debugFileInput">
+            <button type="button" onclick="debugUpload()">Upload Test</button>
+        </form>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+        <button id="drawModeBtn">🖊️ Draw Mode</button>
+        <button id="selectModeBtn">👆 Select Mode</button>
+        <button id="deleteBoxBtn" disabled>🗑️ Delete Selected Box</button>
+        <button id="rerunInferenceBtn" class="btn-warning">🔄 Re-run OCR</button>
+        <div class="image-split-controls">
+            <label for="splitImageToggle"
+                   style="margin-right:10px; font-weight:bold;">Split Image:</label>
+            <input type="checkbox" id="splitImageToggle"
+                   style="transform:scale(1.5); margin-right:10px;">
+            <span>Process left half first, then right half</span>
+            <div class="split-indicator" id="splitIndicator">SPLIT MODE</div>
+        </div>
+        <div class="current-image" id="currentImageName">No image loaded</div>
+        <div id="pdfControls" style="display:none; gap:8px; align-items:center;">
+            <button id="prevPageBtn">⬅️ Prev Page</button>
+            <span id="pageIndicator">Page 1 / 1</span>
+            <button id="nextPageBtn">Next Page ➡️</button>
+        </div>
+    </div>
+
+    <!-- STATUS BAR — above image panel -->
+    <div class="status-bar">
+        <h3>Processing Status</h3>
+
+        <div id="statusWaiting"
+             style="text-align:center; padding:20px; color:#aaa;">
+            <span style="font-size:32px;">📄</span>
+            <span style="margin-left:10px;">Upload an image to begin</span>
+        </div>
+
+        <div id="statusPanel" style="display:none;">
+            <div class="status-bar-inner">
+
+                <!-- Current page filename -->
+                <div class="status-card">
+                    <div class="status-card-label">Current Page</div>
+                    <div id="statusFilename" class="status-card-value"></div>
+                </div>
+
+                <!-- Line count -->
+                <div class="status-card" style="text-align:center;">
+                    <div class="status-card-label">Lines Detected</div>
+                    <div id="statusLineCount" class="line-count-value">—</div>
+                </div>
+
+                <!-- Pipeline lights -->
+                <div class="pipeline-lights">
+                    <div class="status-card-label">Pipeline Status</div>
+
+                    <div class="light-row">
+                        <div id="lightKraken" class="status-light"></div>
+                        <div class="light-text">
+                            <div class="light-title">Kraken Segmentation</div>
+                            <div id="labelKraken" class="light-label">Waiting</div>
+                        </div>
+                    </div>
+
+                    <div class="light-row">
+                        <div id="lightTrOCR" class="status-light"></div>
+                        <div class="light-text">
+                            <div class="light-title">TrOCR Recognition</div>
+                            <div id="labelTrOCR" class="light-label">Waiting</div>
+                        </div>
+                    </div>
+
+                    <div class="light-row">
+                        <div id="lightLLM" class="status-light"></div>
+                        <div class="light-text">
+                            <div class="light-title">LLM Correction</div>
+                            <div id="labelLLM" class="light-label">Waiting</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sample line preview (10th line) -->
+                <div class="sample-line-card">
+                    <div class="status-card-label">
+                        Sample Line
+                        <span id="sampleLineNum"
+                              style="color:var(--purple-main); font-weight:bold;">
+                        </span>
+                    </div>
+                    <img id="sampleLineImg" class="sample-line-image"
+                         src="" alt="Sample line"
+                         style="display:none;">
+                    <div id="sampleLineNoImg"
+                         style="font-size:11px; color:#aaa; margin-bottom:6px;">
+                        No image
+                    </div>
+                    <div class="sample-text-row">
+                        <span class="sample-text-label">OCR:</span>
+                        <span id="sampleTrOCR" class="sample-text-value">—</span>
+                    </div>
+                    <div class="sample-text-row">
+                        <span class="sample-text-label">LLM:</span>
+                        <span id="sampleLLM" class="sample-text-value llm">—</span>
+                    </div>
+                </div>
+
+                <!-- Action buttons -->
+                <div class="status-actions">
+                    <button onclick="openInEditor()"
+                            id="openEditorBtn" disabled>
+                        ✏️ Edit in Editor
+                    </button>
+                    <button onclick="downloadCurrentText()"
+                            id="downloadTxtBtn" disabled>
+                        ⬇️ Download TXT
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Panel — full width below status bar -->
+    <div class="image-panel">
+        <h3>📷 Image &amp; Annotations</h3>
+        <div class="canvas-container">
+            <canvas id="annotationCanvas" width="600" height="400"></canvas>
+        </div>
+
+        <div style="margin-top:15px;">
+            <div>
+                <label for="errorType">Error Type:</label>
+                <select id="errorType">
+                    <option value="spelling">Spelling</option>
+                    <option value="grammar">Grammar</option>
+                    <option value="spacing">Spacing</option>
+                    <option value="formatting">Formatting</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            <div style="margin-top:10px;">
+                <label for="textInput">Annotation Text:</label>
+                <input type="text" id="textInput"
+                       placeholder="Enter text for annotation">
+            </div>
+            <div style="margin-top:10px;">
+                <label>Spanish Characters:</label>
+                <div class="spanish-chars">
+                    <button type="button" onclick="insertSpanishChar('ñ')">ñ</button>
+                    <button type="button" onclick="insertSpanishChar('á')">á</button>
+                    <button type="button" onclick="insertSpanishChar('é')">é</button>
+                    <button type="button" onclick="insertSpanishChar('í')">í</button>
+                    <button type="button" onclick="insertSpanishChar('ó')">ó</button>
+                    <button type="button" onclick="insertSpanishChar('ú')">ú</button>
+                    <button type="button" onclick="insertSpanishChar('ü')">ü</button>
+                    <button type="button" onclick="insertSpanishChar('¿')">¿</button>
+                    <button type="button" onclick="insertSpanishChar('¡')">¡</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+        <button id="nextImageBtn">▶️ Next Image</button>
+        <button id="saveAnnotationsBtn" class="btn-success">💾 Save Annotations</button>
+        <button id="clearAllBtn" class="btn-danger">🗑️ Clear All Boxes</button>
+    </div>
+
+    <div class="status" id="statusMessage"></div>
+
+</div><!-- end .container -->
+
+<script>
+    const canvas = new fabric.Canvas('annotationCanvas')
+
+    let currentImageName    = ''
+    let isDrawing           = false
+    let startX, startY
+    let currentRect         = null
+    let drawMode            = true
+    let currentInferenceData = null
+    let currentLineSegments = []
+    let isImageSplit        = false
+    let isPdf               = false
+    let pdfPages            = []
+    let currentPageIndex    = 0
+    let currentBatchManifestId = null
+
+    canvas.selection = false
+    canvas.setDimensions({ width: 1400, height: 950 })
+
+    // ── Init ───────────────────────────────────────────────────
+    function init() {
+        setupEventListeners()
+        loadFirstImage()
+        updateModeButtons()
+    }
+
+    function setupEventListeners() {
+        document.getElementById('fileInput')
+            .addEventListener('change', handleFileUpload)
+        document.getElementById('directoryInput')
+            .addEventListener('change', handleDirectoryUpload)
+        document.getElementById('drawModeBtn')
+            .addEventListener('click', () => setDrawMode(true))
+        document.getElementById('selectModeBtn')
+            .addEventListener('click', () => setDrawMode(false))
+        document.getElementById('deleteBoxBtn')
+            .addEventListener('click', deleteSelectedBox)
+        document.getElementById('nextImageBtn')
+            .addEventListener('click', loadNextImage)
+        document.getElementById('saveAnnotationsBtn')
+            .addEventListener('click', saveAnnotations)
+        document.getElementById('clearAllBtn')
+            .addEventListener('click', clearAllBoxes)
+        document.getElementById('rerunInferenceBtn')
+            .addEventListener('click', rerunInference)
+        document.getElementById('splitImageToggle')
+            .addEventListener('change', function () {
+                isImageSplit = this.checked
+                document.getElementById('splitIndicator').style.display =
+                    isImageSplit ? 'inline-block' : 'none'
             })
-            .then(response => response.json())
-            .then(data => {
-                // Hide loading indicator
-                loadingIndicator.style.display = 'none';
-                
-                if (data.success) {
-                    // Handle PDF response
-                    if (data.is_pdf) {
-                        isPdf = true;
-                        pdfPages = data.page_filenames || [];
-                        currentPageIndex = 0;
-                        currentImageName = data.first_page || '';
-                        togglePdfControls(true, data.total_pages || pdfPages.length);
-                    } else {
-                        isPdf = false;
-                        pdfPages = [];
-                        currentImageName = data.filename;
-                        togglePdfControls(false, 0);
-                        currentLineSegments = data.line_segments || [];
-                    }
-                    loadCurrentImage();
-                    loadInferenceData();
-                    updateImageName();
-
-                    if (data.split_processing) {
-                        showStatus(`File uploaded successfully! Split processing completed. Left: ${data.left_lines} lines, Right: ${data.right_lines} lines.`, 'success');
-                        // If split, allow quick navigation between halves
-                        if (!isPdf && data.left_image && data.right_image) {
-                            isPdf = true; // reuse page nav UI for halves
-                            pdfPages = [data.left_image, data.right_image];
-                            currentPageIndex = 0;
-                            currentImageName = data.left_image;
-                            togglePdfControls(true, pdfPages.length);
-                        }
-                    } else if (data.is_pdf) {
-                        showStatus(`PDF uploaded successfully! Rendered ${data.total_pages} pages. Processing results can be viewed page-by-page.`, 'success');
-                    } else {
-                        showStatus(`File uploaded successfully! OCR completed with ${data.total_lines} line segments.`, 'success');
-                    }
-                } else {
-                    showStatus(`Upload failed: ${data.error}`, 'error');
-                }
+        canvas.on('mouse:down', onMouseDown)
+        canvas.on('mouse:move', onMouseMove)
+        canvas.on('mouse:up', onMouseUp)
+        canvas.on('selection:created', onSelectionCreated)
+        canvas.on('selection:updated', onSelectionUpdated)
+        canvas.on('selection:cleared', onSelectionCleared)
+        document.getElementById('errorType')
+            .addEventListener('change', updateSelectedBoxErrorType)
+        document.getElementById('textInput')
+            .addEventListener('input', updateSelectedBoxText)
+        document.getElementById('prevPageBtn')
+            .addEventListener('click', () => {
+                if (!isPdf || !pdfPages.length) return
+                currentPageIndex = Math.max(0, currentPageIndex - 1)
+                currentImageName = pdfPages[currentPageIndex]
+                updatePageIndicator(currentPageIndex, pdfPages.length)
+                loadCurrentImage(); loadInferenceData(); updateImageName()
             })
-            .catch(error => {
-                // Hide loading indicator
-                loadingIndicator.style.display = 'none';
-                console.error('Upload error:', error);
-                showStatus('Upload failed. Please try again.', 'error');
-            });
-            
-            // Reset file input
-            event.target.value = '';
+        document.getElementById('nextPageBtn')
+            .addEventListener('click', () => {
+                if (!isPdf || !pdfPages.length) return
+                currentPageIndex = Math.min(pdfPages.length - 1, currentPageIndex + 1)
+                currentImageName = pdfPages[currentPageIndex]
+                updatePageIndicator(currentPageIndex, pdfPages.length)
+                loadCurrentImage(); loadInferenceData(); updateImageName()
+            })
+    }
+
+    // ── File upload ────────────────────────────────────────────
+    async function handleFileUpload(event) {
+        const file = event.target.files[0]
+        if (!file) return
+
+        if (!isImageSplit && file.type && file.type.startsWith('image/')) {
+            try {
+                const dims = await getImageDimensions(file)
+                if (dims && dims.width / Math.max(1, dims.height) >= 1.25) {
+                    const wantSplit = confirm(
+                        'This image looks like a two-page scan. Split into left and right pages?'
+                    )
+                    isImageSplit = wantSplit
+                    document.getElementById('splitImageToggle').checked = wantSplit
+                    document.getElementById('splitIndicator').style.display =
+                        wantSplit ? 'inline-block' : 'none'
+                }
+            } catch (e) {}
         }
 
-        function getImageDimensions(file) {
-            return new Promise((resolve, reject) => {
-                try {
-                    const reader = new FileReader();
-                    reader.onload = e => {
-                        const img = new Image();
-                        img.onload = () => resolve({ width: img.width, height: img.height });
-                        img.onerror = reject;
-                        img.src = e.target.result;
-                    };
-                    reader.onerror = reject;
-                    reader.readAsDataURL(file);
-                } catch (err) {
-                    reject(err);
-                }
-            });
-        }
-        
-        function handleDirectoryUpload(event) {
-            const files = Array.from(event.target.files)
-            if (!files || files.length === 0) return
+        const formData = new FormData()
+        formData.append('file', file)
+        formData.append('split_image', isImageSplit)
 
-            const imageExtensions = ['jpg','jpeg','png','tiff','tif','bmp','gif']
-            const validFiles = files.filter(f => {
-                const ext = f.name.split('.').pop().toLowerCase()
-                return imageExtensions.includes(ext)
-            })
+        document.getElementById('loadingIndicator').style.display = 'block'
+        showStatus(isImageSplit
+            ? 'Uploading and processing image in split mode...'
+            : 'Uploading and processing file...', 'success')
 
-            if (validFiles.length === 0) {
-                showStatus('No valid image files found in selected directory', 'error')
-                return
-            }
-
-            // Sort by filename so pages are in order
-            validFiles.sort((a, b) => a.name.localeCompare(b.name))
-
-            if (!confirm(
-                `Found ${validFiles.length} image files.\n\n` +
-                `Processing will take approximately ${Math.ceil(validFiles.length * 0.5)} ` +
-                `to ${Math.ceil(validFiles.length * 2)} minutes depending on page complexity.\n\n` +
-                `The browser will wait while all pages are processed.\n\nContinue?`
-            )) {
-                event.target.value = ''
-                return
-            }
-
-            // Show progress UI
-            document.getElementById('batchProgress').style.display = 'block'
-            document.getElementById('batchComplete').style.display = 'none'
-            document.getElementById('batchProgressText').textContent =
-                `Uploading ${validFiles.length} files for processing...`
-            document.getElementById('batchProgressBar').style.width = '5%'
-
-            const formData = new FormData()
-            validFiles.forEach(f => formData.append('files', f))
-
-            // Animate progress bar while waiting
-            let fakeProgress = 5
-            const progressInterval = setInterval(() => {
-                fakeProgress = Math.min(fakeProgress + 0.5, 90)
-                document.getElementById('batchProgressBar').style.width =
-                    fakeProgress + '%'
-                const elapsed = Math.round((fakeProgress - 5) / 0.5)
-                document.getElementById('batchProgressText').textContent =
-                    `Processing ${validFiles.length} pages... ` +
-                    `(~${elapsed * 2}s elapsed, please wait)`
-            }, 2000)
-
-            fetch('/upload_directory', {
-                method: 'POST',
-                body: formData
-            })
+        fetch('/upload', { method: 'POST', body: formData })
             .then(r => r.json())
             .then(data => {
-                clearInterval(progressInterval)
-                document.getElementById('batchProgressBar').style.width = '100%'
-
+                document.getElementById('loadingIndicator').style.display = 'none'
                 if (data.success) {
-                    currentBatchManifestId = data.manifest_id
-
-                    document.getElementById('batchProgress').style.display = 'none'
-                    document.getElementById('batchComplete').style.display = 'block'
-                    document.getElementById('batchCompleteText').textContent =
-                        `Processed ${data.processed_count} of ${data.total_files} pages. ` +
-                        (data.failed_count > 0
-                            ? `${data.failed_count} pages failed.`
-                            : 'All pages succeeded.')
-
-                    if (data.failed_count > 0) {
-                        const failedDiv = document.getElementById('batchFailedList')
-                        failedDiv.style.display = 'block'
-                        failedDiv.innerHTML = '<strong>Failed files:</strong><br>' +
-                            data.failed.map(f =>
-                                `${f.original_filename}: ${f.error}`
-                            ).join('<br>')
+                    if (data.is_pdf) {
+                        isPdf = true
+                        pdfPages = data.page_filenames || []
+                        currentPageIndex = 0
+                        currentImageName = data.first_page || ''
+                        togglePdfControls(true, data.total_pages || pdfPages.length)
+                    } else {
+                        isPdf = false; pdfPages = []
+                        currentImageName = data.filename
+                        togglePdfControls(false, 0)
+                        currentLineSegments = data.line_segments || []
                     }
-
-                    // Load the first processed page into the main viewer
-                    if (data.filenames && data.filenames.length > 0) {
-                        currentImageName = data.filenames[0]
-                        updateImageName()
-                        loadCurrentImage()
-                        loadInferenceData()
+                    if (data.split_processing && !data.is_pdf &&
+                        data.left_image && data.right_image) {
+                        isPdf = true
+                        pdfPages = [data.left_image, data.right_image]
+                        currentPageIndex = 0
+                        currentImageName = data.left_image
+                        togglePdfControls(true, pdfPages.length)
                     }
-
-                    showStatus(
-                        `Batch complete: ${data.processed_count} pages processed`,
-                        'success'
-                    )
+                    loadCurrentImage()
+                    loadInferenceData()
+                    updateImageName()
+                    showStatus(data.split_processing
+                        ? `Split done. Left: ${data.left_lines}, Right: ${data.right_lines} lines.`
+                        : data.is_pdf
+                            ? `PDF uploaded. ${data.total_pages} pages.`
+                            : `Done. ${data.total_lines} line segments.`, 'success')
                 } else {
-                    document.getElementById('batchProgress').style.display = 'none'
-                    document.getElementById('batchProgressText').textContent =
-                        'Processing failed: ' + data.error
-                    showStatus('Batch processing failed: ' + data.error, 'error')
+                    showStatus(`Upload failed: ${data.error}`, 'error')
                 }
             })
             .catch(err => {
-                clearInterval(progressInterval)
+                document.getElementById('loadingIndicator').style.display = 'none'
+                showStatus('Upload failed. Please try again.', 'error')
+            })
+
+        event.target.value = ''
+    }
+
+    function getImageDimensions(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader()
+            reader.onload = e => {
+                const img = new Image()
+                img.onload = () => resolve({ width: img.width, height: img.height })
+                img.onerror = reject
+                img.src = e.target.result
+            }
+            reader.onerror = reject
+            reader.readAsDataURL(file)
+        })
+    }
+
+    // ── Directory upload ───────────────────────────────────────
+    function handleDirectoryUpload(event) {
+        const files = Array.from(event.target.files)
+        if (!files.length) return
+
+        const imageExts = ['jpg','jpeg','png','tiff','tif','bmp','gif']
+        const validFiles = files
+            .filter(f => imageExts.includes(f.name.split('.').pop().toLowerCase()))
+            .sort((a, b) => a.name.localeCompare(b.name))
+
+        if (!validFiles.length) {
+            showStatus('No valid image files found in selected directory', 'error')
+            return
+        }
+
+        if (!confirm(
+            `Found ${validFiles.length} image files.\n\n` +
+            `Processing will take several minutes.\n\nContinue?`
+        )) { event.target.value = ''; return }
+
+        document.getElementById('batchProgress').style.display = 'block'
+        document.getElementById('batchComplete').style.display = 'none'
+        document.getElementById('batchProgressText').textContent =
+            `Uploading ${validFiles.length} files...`
+        document.getElementById('batchProgressBar').style.width = '5%'
+
+        const formData = new FormData()
+        validFiles.forEach(f => formData.append('files', f))
+
+        let fakeProgress = 5
+        const interval = setInterval(() => {
+            fakeProgress = Math.min(fakeProgress + 0.5, 90)
+            document.getElementById('batchProgressBar').style.width =
+                fakeProgress + '%'
+        }, 2000)
+
+        fetch('/upload_directory', { method: 'POST', body: formData })
+            .then(r => r.json())
+            .then(data => {
+                clearInterval(interval)
+                document.getElementById('batchProgressBar').style.width = '100%'
+                if (data.success) {
+                    currentBatchManifestId = data.manifest_id
+                    document.getElementById('batchProgress').style.display = 'none'
+                    document.getElementById('batchComplete').style.display = 'block'
+                    document.getElementById('batchCompleteText').textContent =
+                        `Processed ${data.processed_count} of ${data.total_files} pages.` +
+                        (data.failed_count > 0 ? ` ${data.failed_count} failed.` : ' All succeeded.')
+                    if (data.filenames && data.filenames.length > 0) {
+                        currentImageName = data.filenames[0]
+                        updateImageName(); loadCurrentImage(); loadInferenceData()
+                    }
+                    showStatus(`Batch complete: ${data.processed_count} pages`, 'success')
+                } else {
+                    document.getElementById('batchProgress').style.display = 'none'
+                    showStatus('Batch failed: ' + data.error, 'error')
+                }
+            })
+            .catch(err => {
+                clearInterval(interval)
                 document.getElementById('batchProgress').style.display = 'none'
-                console.error('Directory upload error:', err)
                 showStatus('Directory upload failed: ' + err, 'error')
             })
 
-            event.target.value = ''
+        event.target.value = ''
+    }
+
+    function openBatchInEditor() {
+        if (!currentBatchManifestId) return
+        window.open(`/editor?manifest_id=${currentBatchManifestId}`, '_blank')
+    }
+
+    function downloadBatch() {
+        if (!currentBatchManifestId) return
+        window.location.href = `/download_batch/${currentBatchManifestId}`
+    }
+
+    // ── Debug upload ───────────────────────────────────────────
+    function debugUpload() {
+        const file = document.getElementById('debugFileInput').files[0]
+        if (!file) { alert('Please select a file first'); return }
+        const formData = new FormData()
+        formData.append('file', file)
+        formData.append('split_image', isImageSplit)
+        fetch('/upload', { method: 'POST', body: formData })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    currentImageName = data.filename
+                    currentLineSegments = data.line_segments || []
+                    loadCurrentImage(); loadInferenceData(); updateImageName()
+                    alert(`OK: ${data.filename} — ${data.total_lines} lines`)
+                } else {
+                    alert(`Failed: ${data.error}`)
+                }
+            })
+            .catch(e => alert('Upload failed: ' + e))
+    }
+
+    // ── Load inference and update status panel ─────────────────
+    function loadInferenceData() {
+        if (!currentImageName) return
+        const cb = '?t=' + Date.now()
+
+        fetch(`/get_inference/${currentImageName}${cb}`)
+            .then(r => r.json())
+            .then(data => {
+                if (data.error) { resetStatusLights(); return }
+
+                currentInferenceData = data
+                currentLineSegments  = data.line_segments || []
+
+                document.getElementById('statusWaiting').style.display = 'none'
+                document.getElementById('statusPanel').style.display   = 'block'
+                document.getElementById('statusFilename').textContent  = currentImageName
+
+                const lineCount = data.total_lines || 0
+                document.getElementById('statusLineCount').textContent =
+                    lineCount > 0 ? lineCount : '—'
+
+                const hasLines = lineCount > 0
+                setLight('lightKraken', 'labelKraken', hasLines,
+                    hasLines ? `${lineCount} lines detected` : 'No lines detected')
+
+                const hasOcr = currentLineSegments.some(
+                    s => s.ocr_text && s.ocr_text.trim())
+                setLight('lightTrOCR', 'labelTrOCR', hasOcr,
+                    hasOcr ? 'Text recognised' : 'No text recognised')
+
+                const hasLlm = currentLineSegments.some(
+                    s => s.ocr_text_corrected && s.ocr_text_corrected.trim())
+                setLight('lightLLM', 'labelLLM', hasLlm,
+                    hasLlm ? 'Correction applied' : 'No correction available')
+
+                // Sample line — use 10th line (index 9) or last available
+                updateSampleLine(currentLineSegments)
+
+                document.getElementById('openEditorBtn').disabled  = false
+                document.getElementById('downloadTxtBtn').disabled = false
+            })
+            .catch(() => resetStatusLights())
+    }
+
+    function updateSampleLine(segments) {
+        if (!segments || segments.length === 0) return
+
+        // Pick the 10th line (index 9) or the last one if fewer than 10
+        const sampleIdx = Math.min(9, segments.length - 1)
+        const seg = segments[sampleIdx]
+        const cb  = '?t=' + Date.now()
+
+        document.getElementById('sampleLineNum').textContent =
+            ` — Line ${seg.line_index + 1}`
+
+        // Image
+        const imgEl    = document.getElementById('sampleLineImg')
+        const noImgEl  = document.getElementById('sampleLineNoImg')
+        if (seg.image_filename) {
+            imgEl.src = `/line_segment/${encodeURIComponent(seg.image_filename)}${cb}`
+            imgEl.style.display    = 'block'
+            noImgEl.style.display  = 'none'
+            imgEl.onerror = () => {
+                imgEl.style.display   = 'none'
+                noImgEl.style.display = 'block'
+            }
+        } else {
+            imgEl.style.display   = 'none'
+            noImgEl.style.display = 'block'
         }
 
-        function openBatchInEditor() {
-            if (!currentBatchManifestId) {
-                showStatus('No batch loaded', 'error')
-                return
-            }
-            window.open(
-                `/editor?manifest_id=${currentBatchManifestId}`,
-                '_blank'
-            )
-        }
+        // Text
+        document.getElementById('sampleTrOCR').textContent =
+            seg.ocr_text || '—'
+        document.getElementById('sampleLLM').textContent =
+            seg.ocr_text_corrected || '(no LLM output)'
+    }
 
-        function downloadBatch() {
-            if (!currentBatchManifestId) {
-                showStatus('No batch loaded', 'error')
-                return
-            }
-            window.location.href = `/download_batch/${currentBatchManifestId}`
+    function setLight(lightId, labelId, isGreen, labelText) {
+        const light = document.getElementById(lightId)
+        const label = document.getElementById(labelId)
+        if (light) {
+            light.style.background  = isGreen ? '#27ae60' : '#e74c3c'
+            light.style.boxShadow   = isGreen
+                ? '0 0 8px rgba(39,174,96,0.6)'
+                : '0 0 8px rgba(231,76,60,0.6)'
         }
+        if (label) label.textContent = labelText
+    }
 
-        // Debug upload function
-        function debugUpload() {
-            const fileInput = document.getElementById('debugFileInput');
-            const file = fileInput.files[0];
-            if (!file) {
-                alert('Please select a file first');
-                return;
-            }
-            
-            const formData = new FormData();
-            formData.append('file', file);
-            formData.append('split_image', isImageSplit);
-            
-            fetch('/upload', {
-                method: 'POST',
-                body: formData
+    function resetStatusLights() {
+        ;['lightKraken','lightTrOCR','lightLLM'].forEach(id => {
+            const el = document.getElementById(id)
+            if (el) { el.style.background = '#ccc'; el.style.boxShadow = '0 0 5px rgba(0,0,0,0.2)' }
+        })
+        ;['labelKraken','labelTrOCR','labelLLM'].forEach(id => {
+            const el = document.getElementById(id)
+            if (el) el.textContent = 'Waiting'
+        })
+        document.getElementById('statusLineCount').textContent = '—'
+    }
+
+    // ── Load image onto canvas ─────────────────────────────────
+    function loadCurrentImage() {
+        if (!currentImageName) return
+        const imgUrl = `/image/${currentImageName}?t=${Date.now()}`
+        fabric.Image.fromURL(imgUrl, img => {
+            canvas.clear()
+            const maxW = 1600, maxH = 1000
+            const scale = Math.min(maxW / img.width, maxH / img.height)
+            canvas.setDimensions({
+                width:  img.width  * scale,
+                height: img.height * scale
             })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Debug upload response:', data);
-                if (data.success) {
-                    alert(`Upload successful!\nFilename: ${data.filename}\nOCR: ${data.inference}\nLine segments: ${data.total_lines}`);
-                    // Also update the main interface
-                    currentImageName = data.filename;
-                    currentLineSegments = data.line_segments || [];
-                    loadCurrentImage();
-                    loadInferenceData();
-                    updateImageName();
-                } else {
-                    alert(`Upload failed: ${data.error}`);
-                }
+            canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas), {
+                scaleX: scale, scaleY: scale
             })
-            .catch(error => {
-                console.error('Debug upload error:', error);
-                alert('Upload failed. Check console for details.');
-            });
-        }
-        
-        function loadInferenceData() {
-            if (!currentImageName) return;
-            
-            fetch(`/get_inference/${currentImageName}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.error) {
-                        document.getElementById('originalTextDisplay').textContent = 'No OCR data available';
-                        document.getElementById('correctedText').value = '';
-                        document.getElementById('lineSegmentsContainer').innerHTML = '<div style="padding: 20px; text-align: center; color: #666;">No line segments available</div>';
-                        document.getElementById('lineSegmentsStats').textContent = 'No line segments available';
-                    } else {
-                        currentInferenceData = data;
-                        
-                        // Display combined full text
-                        const fullText = data.original_text || '';
-                        document.getElementById('originalTextDisplay').textContent = fullText;
-                        document.getElementById('correctedText').innerText = data.corrected_text || fullText;                        
-                        // Update line segments
-                        if (data.line_segments && data.line_segments.length > 0) {
-                            currentLineSegments = data.line_segments;
-                            updateLineSegmentsDisplay();
-                            document.getElementById('lineSegmentsStats').textContent = `Found ${data.total_lines} line segments`;
-                        } else {
-                            document.getElementById('lineSegmentsStats').textContent = 'No line segments available';
-                            document.getElementById('lineSegmentsContainer').innerHTML = '<div style="padding: 20px; text-align: center; color: #666;">No line segments available</div>';
-                        }
-                        // Update PDF page indicator
-                        if (isPdf && typeof data.page_index === 'number' && typeof data.total_pages === 'number') {
-                            currentPageIndex = data.page_index;
-                            updatePageIndicator(data.page_index, data.total_pages);
-                        }
-                    }
-                })
-                .catch(error => {
-                    console.error('Error loading inference:', error);
-                });
-        }
-        
-        function updateLineSegmentsDisplay() {
-            const container = document.getElementById('lineSegmentsContainer');
-            
-            if (!currentLineSegments || currentLineSegments.length === 0) {
-                container.innerHTML = '<div style="padding: 20px; text-align: center; color: #666;">No line segments available</div>';
-                return;
-            }
-            
-            let html = '';
-            currentLineSegments.forEach((segment, index) => {
-                html += `
-                    <div class="line-segment-item" data-line-index="${segment.line_index}">
-                        <div class="line-segment-image">
-                            <img src="/line_segment/${segment.image_filename}" alt="Line ${segment.line_index}" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                            <span style="display: none;">Line ${segment.line_index}</span>
-                        </div>
-                        <div class="line-segment-content">
-                            <div class="line-segment-header">
-                                <span class="line-segment-index">Line ${segment.line_index}</span>
-                                <span class="line-segment-confidence">Confidence: ${(segment.confidence * 100).toFixed(1)}%</span>
-                            </div>
-                            <textarea class="line-segment-text" data-line-index="${segment.line_index}" placeholder="OCR text will appear here...">${segment.ocr_text || ''}</textarea>
-                            <div class="line-segment-actions">
-                                <button onclick="saveLineCorrection(${segment.line_index})" class="btn-success">Save</button>
-                                <button onclick="resetLineCorrection(${segment.line_index})" class="btn-warning">Reset</button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            container.innerHTML = html;
-            
-            // Update the full text display with combined line segments
-            updateFullTextFromSegments();
-        }
-        
-        function updateFullTextFromSegments() {
-            if (currentLineSegments && currentLineSegments.length > 0) {
-                const combinedText = currentLineSegments
-                    .sort((a, b) => a.line_index - b.line_index)
-                    .map(segment => segment.ocr_text || '')
-                    .join('\n');
-                
-                document.getElementById('originalTextDisplay').textContent = combinedText;
-                
-                // Also update the corrected text if it's empty or hasn't been modified
-                const correctedText = document.getElementById('correctedText');
-                if (!correctedText.value || correctedText.value === '') {
-                    correctedText.value = combinedText;
-                }
-            }
-        }
-        
-        function saveLineCorrection(lineIndex) {
-            const textarea = document.querySelector(`textarea[data-line-index="${lineIndex}"]`);
-            const correctedText = textarea.value;
-            
-            fetch('/update_line_ocr', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    image: currentImageName,
-                    line_index: lineIndex,
-                    corrected_text: correctedText
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showStatus(`Line ${lineIndex} correction saved!`, 'success');
-                    // Update the segment in memory
-                    const segment = currentLineSegments.find(s => s.line_index === lineIndex);
-                    if (segment) {
-                        segment.ocr_text = correctedText;
-                    }
-                } else {
-                    showStatus(`Error saving line ${lineIndex}: ${data.error}`, 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Error saving line correction:', error);
-                showStatus('Error saving line correction', 'error');
-            });
-        }
-        
-        function resetLineCorrection(lineIndex) {
-            const textarea = document.querySelector(`textarea[data-line-index="${lineIndex}"]`);
-            const segment = currentLineSegments.find(s => s.line_index === lineIndex);
-            if (segment) {
-                textarea.value = segment.ocr_text || '';
-                showStatus(`Line ${lineIndex} reset to original`, 'success');
-            }
-        }
-        
-        function saveAllLineCorrections() {
-            const textareas = document.querySelectorAll('.line-segment-text');
-            let savedCount = 0;
-            let totalCount = textareas.length;
-            
-            textareas.forEach(textarea => {
-                const lineIndex = parseInt(textarea.dataset.lineIndex);
-                const correctedText = textarea.value;
-                
-                fetch('/update_line_ocr', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        image: currentImageName,
-                        line_index: lineIndex,
-                        corrected_text: correctedText
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    savedCount++;
-                    if (data.success) {
-                        // Update the segment in memory
-                        const segment = currentLineSegments.find(s => s.line_index === lineIndex);
-                        if (segment) {
-                            segment.ocr_text = correctedText;
-                        }
-                    }
-                    
-                    if (savedCount === totalCount) {
-                        showStatus(`All ${totalCount} line corrections saved!`, 'success');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error saving line correction:', error);
-                    savedCount++;
-                    if (savedCount === totalCount) {
-                        showStatus('Some line corrections failed to save', 'error');
-                    }
-                });
-            });
-        }
-        
-        function resetAllLineCorrections() {
-            if (confirm('Are you sure you want to reset all line corrections to their original OCR text?')) {
-                const textareas = document.querySelectorAll('.line-segment-text');
-                textareas.forEach(textarea => {
-                    const lineIndex = parseInt(textarea.dataset.lineIndex);
-                    const segment = currentLineSegments.find(s => s.line_index === lineIndex);
-                    if (segment) {
-                        textarea.value = segment.ocr_text || '';
-                    }
-                });
-                showStatus('All line corrections reset to original', 'success');
-            }
-        }
-        
-        function saveCorrection() {
-            if (!currentImageName) {
-                showStatus('No image selected', 'error');
-                return;
-            }
-            
-            const correctedText = document.getElementById('correctedText').value;            
-            fetch('/update_inference', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    image: currentImageName,
-                    corrected_text: correctedText
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showStatus('Correction saved successfully!', 'success');
-                    if (currentInferenceData) {
-                        currentInferenceData.corrected_text = correctedText;
-                    }
-                } else {
-                    showStatus(`Error saving correction: ${data.error}`, 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Error saving correction:', error);
-                showStatus('Error saving correction', 'error');
-            });
-        }
-        
-        function resetCorrection() {
-            if (currentInferenceData) {
-                document.getElementById('correctedText').innerText = currentInferenceData.original_text || '';                showStatus('Reset to original OCR output', 'success');
-            }
-        }
-        
-        function rerunInference() {
-            if (!currentImageName) {
-                showStatus('No image selected', 'error');
-                return;
-            }
-            
-            showStatus('Re-running OCR inference...', 'success');
-            
-            fetch('/rerun_inference', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    image: currentImageName,
-                    split_image: isImageSplit
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Update the display with new inference results
-                    document.getElementById('originalTextDisplay').textContent = data.inference;
-                    document.getElementById('correctedText').value = data.corrected_text || data.inference;
-                    currentLineSegments = data.line_segments || [];
-                    updateLineSegmentsDisplay();
-                    showStatus(data.split_processing ? 'Split OCR inference completed!' : 'OCR inference completed!', 'success');
-                    
-                    // Update current inference data
-                    if (currentInferenceData) {
-                        currentInferenceData.original_text = data.inference;
-                        currentInferenceData.corrected_text = data.corrected_text || data.inference;
-                        currentInferenceData.line_segments = data.line_segments;
-                        currentInferenceData.total_lines = data.total_lines;
-                    }
-                    
-                    document.getElementById('lineSegmentsStats').textContent = `Found ${data.total_lines} line segments`;
-                } else {
-                    showStatus(`Error running inference: ${data.error}`, 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Error running inference:', error);
-                showStatus('Error running inference', 'error');
-            });
-        }
-        
-        function setDrawMode(drawing) {
-            drawMode = drawing;
-            canvas.selection = !drawing;
-            
-            // Clear any active selection when switching modes
-            canvas.discardActiveObject();
-            
-            // Update all existing objects
-            canvas.forEachObject(obj => {
-                if (obj.type === 'rect') {
-                    obj.selectable = !drawing;
-                    obj.evented = !drawing;
-                }
-            });
-            
-            updateModeButtons();
-            canvas.renderAll();
-        }
-        
-        function updateModeButtons() {
-            const drawBtn = document.getElementById('drawModeBtn');
-            const selectBtn = document.getElementById('selectModeBtn');
-            
-            if (drawMode) {
-                drawBtn.style.background = 'linear-gradient(45deg, #28a745, #20c997)';
-                selectBtn.style.background = 'linear-gradient(45deg, #007bff, #0056b3)';
+        })
+    }
+
+    // ── Editor / download shortcuts ────────────────────────────
+    function openInEditor() {
+        if (!currentImageName) return
+        window.open(`/editor?filename=${encodeURIComponent(currentImageName)}`, '_blank')
+    }
+
+    function downloadCurrentText() {
+        if (!currentImageName) return
+        window.location.href = `/download_text/${encodeURIComponent(currentImageName)}`
+    }
+
+    // ── Re-run inference ───────────────────────────────────────
+    function rerunInference() {
+        if (!currentImageName) { showStatus('No image selected', 'error'); return }
+        showStatus('Re-running OCR inference...', 'success')
+        fetch('/rerun_inference', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ image: currentImageName, split_image: isImageSplit })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                currentLineSegments = data.line_segments || []
+                loadInferenceData()
+                showStatus('OCR inference completed!', 'success')
             } else {
-                drawBtn.style.background = 'linear-gradient(45deg, #007bff, #0056b3)';
-                selectBtn.style.background = 'linear-gradient(45deg, #28a745, #20c997)';
+                showStatus(`Error: ${data.error}`, 'error')
             }
-        }
-        
-        function onMouseDown(options) {
-            if (!drawMode) return;
-            
-            isDrawing = true;
-            const pointer = canvas.getPointer(options.e);
-            startX = pointer.x;
-            startY = pointer.y;
-            
-            currentRect = new fabric.Rect({
-                left: startX,
-                top: startY,
-                width: 0,
-                height: 0,
-                fill: 'transparent',
-                stroke: '#ff0000',
-                strokeWidth: 2,
-                selectable: false,
-                evented: false,
-                errorType: 'spelling',
-                text: ''
-            });
-            
-            canvas.add(currentRect);
-        }
-        
-        function onMouseMove(options) {
-            if (!isDrawing || !currentRect) return;
-            
-            const pointer = canvas.getPointer(options.e);
-            const width = Math.abs(pointer.x - startX);
-            const height = Math.abs(pointer.y - startY);
-            
-            currentRect.set({
-                left: Math.min(startX, pointer.x),
-                top: Math.min(startY, pointer.y),
-                width: width,
-                height: height
-            });
-            
-            canvas.renderAll();
-        }
-        
-        function onMouseUp() {
-            if (!isDrawing) return;
-            
-            isDrawing = false;
-            if (currentRect && (currentRect.width < 5 || currentRect.height < 5)) {
-                canvas.remove(currentRect);
-            } else if (currentRect) {
-                // Set the correct interaction properties based on current mode
-                currentRect.set({
-                    selectable: !drawMode,
-                    evented: !drawMode
-                });
+        })
+        .catch(() => showStatus('Error running inference', 'error'))
+    }
+
+    // ── Canvas drawing ─────────────────────────────────────────
+    function setDrawMode(drawing) {
+        drawMode = drawing
+        canvas.selection = !drawing
+        canvas.discardActiveObject()
+        canvas.forEachObject(obj => {
+            if (obj.type === 'rect') {
+                obj.selectable = !drawing
+                obj.evented    = !drawing
             }
-            currentRect = null;
-            canvas.renderAll();
+        })
+        updateModeButtons()
+        canvas.renderAll()
+    }
+
+    function updateModeButtons() {
+        const on  = 'linear-gradient(45deg,#28a745,#20c997)'
+        const off = 'linear-gradient(45deg,#007bff,#0056b3)'
+        document.getElementById('drawModeBtn').style.background   = drawMode ? on : off
+        document.getElementById('selectModeBtn').style.background = drawMode ? off : on
+    }
+
+    function onMouseDown(options) {
+        if (!drawMode) return
+        isDrawing = true
+        const p = canvas.getPointer(options.e)
+        startX = p.x; startY = p.y
+        currentRect = new fabric.Rect({
+            left: startX, top: startY, width: 0, height: 0,
+            fill: 'transparent', stroke: '#ff0000', strokeWidth: 2,
+            selectable: false, evented: false, errorType: 'spelling', text: ''
+        })
+        canvas.add(currentRect)
+    }
+
+    function onMouseMove(options) {
+        if (!isDrawing || !currentRect) return
+        const p = canvas.getPointer(options.e)
+        currentRect.set({
+            left:   Math.min(startX, p.x),
+            top:    Math.min(startY, p.y),
+            width:  Math.abs(p.x - startX),
+            height: Math.abs(p.y - startY)
+        })
+        canvas.renderAll()
+    }
+
+    function onMouseUp() {
+        if (!isDrawing) return
+        isDrawing = false
+        if (currentRect && (currentRect.width < 5 || currentRect.height < 5)) {
+            canvas.remove(currentRect)
+        } else if (currentRect) {
+            currentRect.set({ selectable: !drawMode, evented: !drawMode })
         }
-        
-        function onSelectionCreated(e) {
-            document.getElementById('deleteBoxBtn').disabled = false;
-            updateFormFields(e.selected[0]);
-        }
-        
-        function onSelectionUpdated(e) {
-            updateFormFields(e.selected[0]);
-        }
-        
-        function onSelectionCleared() {
-            document.getElementById('deleteBoxBtn').disabled = true;
-            clearFormFields();
-        }
-        
-        function updateFormFields(obj) {
-            if (obj) {
-                document.getElementById('errorType').value = obj.errorType || 'spelling';
-                document.getElementById('textInput').value = obj.text || '';
-            }
-        }
-        
-        function clearFormFields() {
-            document.getElementById('errorType').value = 'spelling';
-            document.getElementById('textInput').value = '';
-        }
-        
-        function updateSelectedBoxErrorType() {
-            const activeObject = canvas.getActiveObject();
-            if (activeObject) {
-                activeObject.errorType = document.getElementById('errorType').value;
-            }
-        }
-        
-        function updateSelectedBoxText() {
-            const activeObject = canvas.getActiveObject();
-            if (activeObject) {
-                activeObject.text = document.getElementById('textInput').value;
-            }
-        }
-        
-        function deleteSelectedBox() {
-            const activeObject = canvas.getActiveObject();
-            if (activeObject) {
-                canvas.remove(activeObject);
-                canvas.discardActiveObject();
-                canvas.renderAll();
-            }
-        }
-        
-        function clearAllBoxes() {
-            if (confirm('Are you sure you want to clear all annotation boxes?')) {
-                const objects = canvas.getObjects().filter(obj => obj.type === 'rect');
-                objects.forEach(obj => canvas.remove(obj));
-                canvas.renderAll();
-                showStatus('All annotation boxes cleared', 'success');
-            }
-        }
-        
-        function saveAnnotations() {
-            if (!currentImageName) {
-                showStatus('No image selected', 'error');
-                return;
-            }
-            
-            const boxes = canvas.getObjects()
-                .filter(obj => obj.type === 'rect')
-                .map(obj => ({
-                    x: obj.left,
-                    y: obj.top,
-                    width: obj.width,
-                    height: obj.height,
-                    errorType: obj.errorType || 'spelling',
-                    text: obj.text || ''
-                }));
-            
-            const annotationData = {
+        currentRect = null
+        canvas.renderAll()
+    }
+
+    function onSelectionCreated(e) {
+        document.getElementById('deleteBoxBtn').disabled = false
+        updateFormFields(e.selected[0])
+    }
+
+    function onSelectionUpdated(e) { updateFormFields(e.selected[0]) }
+
+    function onSelectionCleared() {
+        document.getElementById('deleteBoxBtn').disabled = true
+        clearFormFields()
+    }
+
+    function updateFormFields(obj) {
+        if (!obj) return
+        document.getElementById('errorType').value = obj.errorType || 'spelling'
+        document.getElementById('textInput').value = obj.text || ''
+    }
+
+    function clearFormFields() {
+        document.getElementById('errorType').value = 'spelling'
+        document.getElementById('textInput').value = ''
+    }
+
+    function updateSelectedBoxErrorType() {
+        const o = canvas.getActiveObject()
+        if (o) o.errorType = document.getElementById('errorType').value
+    }
+
+    function updateSelectedBoxText() {
+        const o = canvas.getActiveObject()
+        if (o) o.text = document.getElementById('textInput').value
+    }
+
+    function deleteSelectedBox() {
+        const o = canvas.getActiveObject()
+        if (o) { canvas.remove(o); canvas.discardActiveObject(); canvas.renderAll() }
+    }
+
+    function clearAllBoxes() {
+        if (!confirm('Clear all annotation boxes?')) return
+        canvas.getObjects().filter(o => o.type === 'rect')
+              .forEach(o => canvas.remove(o))
+        canvas.renderAll()
+        showStatus('All annotation boxes cleared', 'success')
+    }
+
+    function saveAnnotations() {
+        if (!currentImageName) { showStatus('No image selected', 'error'); return }
+        const boxes = canvas.getObjects()
+            .filter(o => o.type === 'rect')
+            .map(o => ({
+                x: o.left, y: o.top, width: o.width, height: o.height,
+                errorType: o.errorType || 'spelling', text: o.text || ''
+            }))
+        fetch('/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
                 image: currentImageName,
                 annotations: boxes,
                 timestamp: new Date().toISOString()
-            };
-            
-            fetch('/save', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(annotationData)
             })
-            .then(response => response.json())
+        })
+        .then(r => r.json())
+        .then(data => showStatus(
+            data.success ? `Annotations saved! (${boxes.length} boxes)` : 'Error saving',
+            data.success ? 'success' : 'error'
+        ))
+        .catch(() => showStatus('Error saving annotations', 'error'))
+    }
+
+    function insertSpanishChar(char) {
+        const ae = document.activeElement
+        const target = (ae && (ae.id === 'textInput' ||
+                                ae.classList.contains('line-segment-text')))
+            ? ae
+            : document.getElementById('textInput')
+        if (!target) return
+        const s = target.selectionStart || 0
+        const e = target.selectionEnd   || 0
+        target.value = target.value.substring(0, s) + char + target.value.substring(e)
+        target.setSelectionRange(s + 1, s + 1)
+        target.focus()
+        target.dispatchEvent(new Event('input', { bubbles: true }))
+        if (target.id === 'textInput') updateSelectedBoxText()
+    }
+
+    function showStatus(message, type) {
+        const el = document.getElementById('statusMessage')
+        el.textContent = message
+        el.className   = `status ${type}`
+        el.style.display = 'block'
+        setTimeout(() => { el.style.display = 'none' }, 5000)
+    }
+
+    function updateImageName() {
+        document.getElementById('currentImageName').textContent =
+            currentImageName || 'No image loaded'
+    }
+
+    function togglePdfControls(show, totalPages) {
+        document.getElementById('pdfControls').style.display = show ? 'flex' : 'none'
+        if (show) updatePageIndicator(currentPageIndex, totalPages)
+    }
+
+    function updatePageIndicator(idx, total) {
+        document.getElementById('pageIndicator').textContent =
+            `Page ${idx + 1} / ${total}`
+    }
+
+    function loadFirstImage() {
+        fetch('/get_current_image')
+            .then(r => r.json())
             .then(data => {
-                if (data.success) {
-                    showStatus(`Annotations saved! (${boxes.length} boxes)`, 'success');
-                } else {
-                    showStatus('Error saving annotations', 'error');
+                if (data.image_name) {
+                    currentImageName = data.image_name
+                    updateImageName()
+                    loadCurrentImage()
+                    loadInferenceData()
                 }
             })
-            .catch(error => {
-                console.error('Error saving annotations:', error);
-                showStatus('Error saving annotations', 'error');
-            });
-        }
-        
-        function insertSpanishChar(char) {
-            // Get the currently focused textarea or input
-            const activeElement = document.activeElement;
-            let targetInput;
-            
-            // Determine which input to use
-            if (activeElement && (activeElement.id === 'textInput' || activeElement.id === 'correctedText' || activeElement.classList.contains('line-segment-text'))) {
-                targetInput = activeElement;
-            } else {
-                // Default to corrected text if no specific input is focused
-                targetInput = document.getElementById('correctedText');
-            }
-            
-            if (!targetInput) {
-                console.log('No target input found');
-                return;
-            }
-            
-            const start = targetInput.selectionStart || 0;
-            const end = targetInput.selectionEnd || 0;
-            const text = targetInput.value;
-            
-            targetInput.value = text.substring(0, start) + char + text.substring(end);
-            targetInput.setSelectionRange(start + 1, start + 1);
-            targetInput.focus();
-            
-            // Trigger input event to ensure the change is registered
-            const event = new Event('input', { bubbles: true });
-            targetInput.dispatchEvent(event);
-            
-            // Update the selected box if working with annotation text
-            if (targetInput.id === 'textInput') {
-                updateSelectedBoxText();
-            }
-            
-            console.log(`Inserted character '${char}' at position ${start}`);
-        }
-        
-        function showStatus(message, type) {
-            const statusElement = document.getElementById('statusMessage');
-            statusElement.textContent = message;
-            statusElement.className = `status ${type}`;
-            statusElement.style.display = 'block';
-            
-            setTimeout(() => {
-                statusElement.style.display = 'none';
-            }, 5000);
-        }
-        
-        function updateImageName() {
-            document.getElementById('currentImageName').textContent = currentImageName || 'No image loaded'
-            
-            const editorBtn = document.getElementById('openEditorBtn')
-            if (editorBtn) editorBtn.disabled = !currentImageName
+    }
 
-            const downloadBtn = document.getElementById('downloadTxtBtn')
-            if (downloadBtn) downloadBtn.disabled = !currentImageName
-}
-
-        function openInEditor() {
-            if (!currentImageName) {
-                showStatus('No image loaded', 'error')
-                return
-            }
-            // Open editor in new tab pre-loaded with current filename
-            window.open(`/editor?filename=${encodeURIComponent(currentImageName)}`, '_blank')
-        }
-        
-        function loadCurrentImage() {
-            if (!currentImageName) return;
-            const imgUrl = `/image/${currentImageName}`;
-            
-            fabric.Image.fromURL(imgUrl, img => {
-                canvas.clear();
-                
-                // Preserve aspect ratio and resize canvas to fit image with larger viewport
-                const maxWidth = 1600;
-                const maxHeight = 1000;
-                
-                let scaleX = maxWidth / img.width;
-                let scaleY = maxHeight / img.height;
-                let scale = Math.min(scaleX, scaleY);
-                
-                const newWidth = img.width * scale;
-                const newHeight = img.height * scale;
-                
-                canvas.setDimensions({
-                    width: newWidth,
-                    height: newHeight
-                });
-                
-                canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas), {
-                    scaleX: scale,
-                    scaleY: scale
-                });
-            });
-        }
-
-        // Corrected text zoom controls
-        (function initTextZoom(){
-            const correctedText = document.getElementById('correctedText');
-            const inc = document.getElementById('increaseTextZoom');
-            const dec = document.getElementById('decreaseTextZoom');
-            let currentSize = 20;
-            function applySize(){ correctedText.style.fontSize = currentSize + 'px'; }
-            inc.addEventListener('click', () => { currentSize = Math.min(40, currentSize + 2); applySize(); });
-            dec.addEventListener('click', () => { currentSize = Math.max(14, currentSize - 2); applySize(); });
-        })();
-
-        // PDF controls
-        function togglePdfControls(show, totalPages) {
-            const ctrls = document.getElementById('pdfControls');
-            ctrls.style.display = show ? 'flex' : 'none';
-            if (show) updatePageIndicator(currentPageIndex, totalPages);
-        }
-
-        function updatePageIndicator(pageIndex, totalPages) {
-            const el = document.getElementById('pageIndicator');
-            el.textContent = `Page ${pageIndex + 1} / ${totalPages}`;
-        }
-
-        document.getElementById('prevPageBtn').addEventListener('click', () => {
-            if (!isPdf || pdfPages.length === 0) return;
-            currentPageIndex = Math.max(0, currentPageIndex - 1);
-            currentImageName = pdfPages[currentPageIndex];
-            updatePageIndicator(currentPageIndex, pdfPages.length);
-            loadCurrentImage();
-            loadInferenceData();
-            updateImageName();
-        });
-
-        document.getElementById('nextPageBtn').addEventListener('click', () => {
-            if (!isPdf || pdfPages.length === 0) return;
-            currentPageIndex = Math.min(pdfPages.length - 1, currentPageIndex + 1);
-            currentImageName = pdfPages[currentPageIndex];
-            updatePageIndicator(currentPageIndex, pdfPages.length);
-            loadCurrentImage();
-            loadInferenceData();
-            updateImageName();
-        });
-        
-        function loadFirstImage() {
-            fetch('/get_current_image')
-                .then(response => response.json())
-                .then(data => {
-                    if (data.image_name) {
-                        currentImageName = data.image_name;
-                        updateImageName();
-                        loadCurrentImage();
-                        loadInferenceData();
-                    }
-                });
-        }
-        
-        function loadNextImage() {
-            fetch('/next_image', { method: 'POST' })
-                .then(response => response.json())
-                .then(data => {
-                    currentImageName = data.image_name || '';
-                    updateImageName();
-                    if (currentImageName) {
-                        loadCurrentImage();
-                        loadInferenceData();
-                    } else {
-                        showStatus('No more images.', 'error');
-                    }
-                });
-        }
-        
-        // Scroll to OCR results function
-        function scrollToOCRResults() {
-            const inferencePanel = document.querySelector('.inference-panel');
-            if (inferencePanel) {
-                inferencePanel.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-            }
-        }
-        
-        // Handle scroll events to show/hide scroll indicator
-        function handleScroll() {
-            const imagePanel = document.querySelector('.image-panel');
-            const scrollIndicator = document.getElementById('scrollIndicator');
-            
-            if (imagePanel && scrollIndicator) {
-                const rect = imagePanel.getBoundingClientRect();
-                const isImagePanelVisible = rect.bottom > 0 && rect.top < window.innerHeight;
-                
-                // Show indicator when image panel is visible and OCR results are not yet visible
-                if (isImagePanelVisible && rect.bottom > window.innerHeight * 0.5) {
-                    scrollIndicator.style.display = 'block';
+    function loadNextImage() {
+        fetch('/next_image', { method: 'POST' })
+            .then(r => r.json())
+            .then(data => {
+                currentImageName = data.image_name || ''
+                updateImageName()
+                if (currentImageName) {
+                    loadCurrentImage()
+                    loadInferenceData()
                 } else {
-                    scrollIndicator.style.display = 'none';
+                    showStatus('No more images.', 'error')
                 }
-            }
-        }
-        
-        // Initialize when DOM is loaded
-        document.addEventListener('DOMContentLoaded', function() {
-            init();
-            
-            // Add scroll event listener to window
-            window.addEventListener('scroll', handleScroll);
-            
-            console.log("✅ App initialized");
-        });
+            })
+    }
 
-        function downloadCurrentText() {
-            if (!currentImageName) {
-                showStatus('No image loaded', 'error')
-                return
+    document.addEventListener('DOMContentLoaded', () => {
+        init()
+        console.log('App initialized')
+    })
+
+        // ── Preprocessing ──────────────────────────────────────────
+    document.getElementById('preprocessFileInput')
+        .addEventListener('change', function(e) {
+            const file = e.target.files[0]
+            if (!file) return
+            const method = document.getElementById('preprocessMethod').value
+            const formData = new FormData()
+            formData.append('file', file)
+            formData.append('method', method)
+
+            showPreprocessProgress('Processing image...')
+
+            fetch('/preprocess_image', { method: 'POST', body: formData })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        showPreprocessProgress(
+                            `Done: ${data.label} applied. ` +
+                            `Saved as: ${data.filename}`, true
+                        )
+                    } else {
+                        showPreprocessProgress(`Error: ${data.error}`, false)
+                    }
+                })
+                .catch(e => showPreprocessProgress(`Failed: ${e}`, false))
+
+            e.target.value = ''
+        })
+
+    function preprocessDirectory() {
+        const method = document.getElementById('preprocessMethod').value
+        showPreprocessProgress('Processing all images in uploads folder...')
+
+        fetch('/preprocess_directory', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ method: method })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                showPreprocessProgress(
+                    `Done: ${data.label} applied to ${data.processed_count} images. ` +
+                    (data.failed_count > 0 ? `${data.failed_count} failed.` : ''),
+                    true
+                )
+            } else {
+                showPreprocessProgress(`Error: ${data.error}`, false)
             }
-            window.location.href = `/download_text/${encodeURIComponent(currentImageName)}`
+        })
+        .catch(e => showPreprocessProgress(`Failed: ${e}`, false))
+    }
+
+    function showPreprocessProgress(message, success) {
+        const el = document.getElementById('preprocessProgress')
+        el.style.display = 'block'
+        el.textContent = message
+        if (success === true) {
+            el.style.background = '#d5f5e3'
+            el.style.color = '#1e8449'
+        } else if (success === false) {
+            el.style.background = '#fadbd8'
+            el.style.color = '#922b21'
+        } else {
+            el.style.background = '#d6eaf8'
+            el.style.color = '#1a5276'
         }
-    </script>
+    }
+
+</script>
 </body>
 </html>
